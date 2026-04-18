@@ -15,14 +15,16 @@ import (
 
 func main() {
 	var (
-		user       = flag.String("user", "", "GitHub username (required)")
-		token      = flag.String("token", os.Getenv("GITHUB_TOKEN"), "GitHub token (or env GITHUB_TOKEN)")
-		out        = flag.String("out", "output", "output directory")
-		themesFlag = flag.String("themes", "dracula", "comma-separated theme ids, or 'all'")
-		tzName     = flag.String("tz", "Local", "timezone for productive-time card (IANA name, e.g. Asia/Saigon)")
-		topRepos   = flag.Int("top-repos", 10, "owned repos to sample for productive-time heatmap (0 to skip)")
-		perRepo    = flag.Int("commits-per-repo", 500, "max commits sampled per repo (covers both last-year and all-time aggregates)")
-		listThemes = flag.Bool("list-themes", false, "print available theme ids and exit")
+		user           = flag.String("user", "", "GitHub username (required)")
+		token          = flag.String("token", os.Getenv("GITHUB_TOKEN"), "GitHub token (or env GITHUB_TOKEN)")
+		out            = flag.String("out", "output", "output directory")
+		themesFlag     = flag.String("themes", "dracula", "comma-separated theme ids, or 'all'")
+		tzName         = flag.String("tz", "Local", "timezone for productive-time card (IANA name, e.g. Asia/Saigon)")
+		topRepos       = flag.Int("top-repos", 0, "optional cap on seed repos probed for commit history (0 = unlimited)")
+		perRepo        = flag.Int("commits-per-repo", 500, "max commits sampled per repo (covers both last-year and all-time aggregates)")
+		includeForks   = flag.Bool("include-forks", false, "include forked repos in stats and commit probing")
+		includePrivate = flag.Bool("include-private", false, "include private repos (requires PAT with repo scope)")
+		listThemes     = flag.Bool("list-themes", false, "print available theme ids and exit")
 	)
 	flag.Parse()
 
@@ -51,26 +53,35 @@ func main() {
 		loc = time.UTC
 	}
 
+	opts := github.FetchOptions{
+		IncludeForks:   *includeForks,
+		IncludePrivate: *includePrivate,
+	}
+
 	client := github.NewClient(*token)
-	profile, err := client.FetchProfile(*user)
+	profile, err := client.FetchProfile(*user, opts)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: fetch profile: %v\n", err)
 		os.Exit(1)
 	}
 	profile.UTCOffsetLabel = utcOffsetLabel(loc)
 
-	if *topRepos > 0 && profile.ID != "" {
-		repos := profile.TopRepos
-		if len(repos) > *topRepos {
+	// Year-loop fetch populates SeedRepos from commitContributionsByRepository
+	// plus the all-time contribution calendar; must precede FetchProductive so
+	// commit-history probes land on repos where the user actually committed.
+	if len(profile.ContributionYears) > 0 {
+		if err := client.FetchContributionsAllTime(profile, opts); err != nil {
+			fmt.Fprintf(os.Stderr, "warn: all-time contributions fetch: %v\n", err)
+		}
+	}
+
+	if profile.ID != "" && len(profile.SeedRepos) > 0 {
+		repos := profile.SeedRepos
+		if *topRepos > 0 && len(repos) > *topRepos {
 			repos = repos[:*topRepos]
 		}
 		if err := client.FetchProductive(profile, repos, loc, *perRepo); err != nil {
 			fmt.Fprintf(os.Stderr, "warn: productive-time + commits-per-language fetch: %v\n", err)
-		}
-	}
-	if len(profile.ContributionYears) > 0 {
-		if err := client.FetchContributionsAllTime(profile); err != nil {
-			fmt.Fprintf(os.Stderr, "warn: all-time contributions fetch: %v\n", err)
 		}
 	}
 

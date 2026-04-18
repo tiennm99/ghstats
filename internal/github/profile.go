@@ -57,10 +57,18 @@ type profileGQL struct {
 	} `json:"user"`
 }
 
+// FetchOptions tunes which repos contribute to the profile's aggregates.
+// All defaults are conservative (no forks, no private) so public-facing
+// READMEs don't accidentally leak work-repo signal.
+type FetchOptions struct {
+	IncludeForks   bool
+	IncludePrivate bool
+}
+
 // FetchProfile collects profile, stats and repos-per-language data for the
 // given user. Owned repos are paginated up to 10 pages (1000 repos) as a
-// safety cap.
-func (c *Client) FetchProfile(login string) (*Profile, error) {
+// safety cap. Forks and private repos are filtered client-side per opts.
+func (c *Client) FetchProfile(login string, opts FetchOptions) (*Profile, error) {
 	if login == "" {
 		return nil, errors.New("empty user")
 	}
@@ -68,6 +76,7 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 	p := &Profile{Login: login}
 	reposPerLang := map[string]int64{}
 	langColor := map[string]string{}
+	publicRepoCount := 0
 
 	var cursor *string
 	const maxPages = 10
@@ -99,7 +108,6 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 			}
 			p.Followers = u.Followers.TotalCount
 			p.Following = u.Following.TotalCount
-			p.PublicRepos = u.Repositories.TotalCount
 			p.TotalPRs = u.PullRequests.TotalCount
 			p.TotalIssues = u.Issues.TotalCount
 			p.TotalContributedTo = u.RepositoriesContributedTo.TotalCount
@@ -126,27 +134,24 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 		}
 
 		for _, r := range u.Repositories.Nodes {
+			if r.IsFork && !opts.IncludeForks {
+				continue
+			}
+			if r.IsPrivate && !opts.IncludePrivate {
+				continue
+			}
+			publicRepoCount++
 			p.TotalStars += r.StargazerCount
 			p.TotalForks += r.ForkCount
 
-			info := RepoInfo{Name: r.Name}
+			info := r.toRepoInfo(login)
 			if r.PrimaryLanguage != nil {
-				info.PrimaryLanguage = r.PrimaryLanguage.Name
-				info.PrimaryColor = r.PrimaryLanguage.Color
 				reposPerLang[r.PrimaryLanguage.Name]++
 				if _, ok := langColor[r.PrimaryLanguage.Name]; !ok {
 					langColor[r.PrimaryLanguage.Name] = r.PrimaryLanguage.Color
 				}
 			}
-			// Carry the repo's full language-bytes breakdown so commit
-			// attribution can distribute each commit across all languages
-			// the repo contains, not just the primary.
 			for _, e := range r.Languages.Edges {
-				info.Languages = append(info.Languages, LangEdge{
-					Name:  e.Node.Name,
-					Color: e.Node.Color,
-					Bytes: e.Size,
-				})
 				if _, ok := langColor[e.Node.Name]; !ok {
 					langColor[e.Node.Name] = e.Node.Color
 				}
@@ -162,6 +167,7 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 	}
 
 	p.ReposByLanguage = sortLangStats(reposPerLang, langColor)
+	p.PublicRepos = publicRepoCount
 	return p, nil
 }
 

@@ -1,8 +1,8 @@
 package github
 
 // profileQuery pulls everything needed for the profile, stats and languages
-// cards in one round trip. Repo pagination is handled by the caller if the
-// user owns more than 100 repos.
+// cards in one round trip. Fork/private filtering is done client-side so one
+// query handles all combinations of -include-forks / -include-private.
 const profileQuery = `
 query($login: String!, $after: String) {
   user(login: $login) {
@@ -45,13 +45,14 @@ query($login: String!, $after: String) {
       first: 100
       after: $after
       ownerAffiliations: OWNER
-      isFork: false
       orderBy: { field: STARGAZERS, direction: DESC }
     ) {
       totalCount
       pageInfo { hasNextPage endCursor }
       nodes {
         name
+        isPrivate
+        isFork
         stargazerCount
         forkCount
         primaryLanguage { name color }
@@ -68,10 +69,11 @@ query($login: String!, $after: String) {
 
 // commitHistoryQuery fetches commit timestamps in the default branch of one
 // repo, filtered to commits authored by the target user. Used to build the
-// productive-time heatmap.
+// productive-time heatmap. Owner is a variable because seed repos may belong
+// to other users (e.g. forks the user has contributed to).
 const commitHistoryQuery = `
-query($login: String!, $repo: String!, $userId: ID!, $after: String) {
-  repository(owner: $login, name: $repo) {
+query($owner: String!, $repo: String!, $userId: ID!, $after: String) {
+  repository(owner: $owner, name: $repo) {
     defaultBranchRef {
       target {
         ... on Commit {
@@ -85,9 +87,10 @@ query($login: String!, $repo: String!, $userId: ID!, $after: String) {
   }
 }`
 
-// contributionYearQuery fetches a single year's contribution calendar days
-// plus the commit total for that year. Looped in Go over user.contributionYears
-// to build the all-time contribution series and lifetime commit count.
+// contributionYearQuery fetches one year's contribution calendar plus the
+// repos the user actually committed in that year. The calendar feeds the
+// all-time area chart; commitContributionsByRepository feeds the seed list
+// that drives commit-history probing.
 const contributionYearQuery = `
 query($login: String!, $from: DateTime!, $to: DateTime!) {
   user(login: $login) {
@@ -98,6 +101,22 @@ query($login: String!, $from: DateTime!, $to: DateTime!) {
           contributionDays {
             contributionCount
             date
+          }
+        }
+      }
+      commitContributionsByRepository(maxRepositories: 100) {
+        contributions { totalCount }
+        repository {
+          name
+          owner { login }
+          isPrivate
+          isFork
+          primaryLanguage { name color }
+          languages(first: 20, orderBy: { field: SIZE, direction: DESC }) {
+            edges {
+              size
+              node { name color }
+            }
           }
         }
       }

@@ -11,8 +11,10 @@ token="${INPUT_TOKEN:-${GITHUB_TOKEN:-}}"
 out="${INPUT_OUT:-output}"
 themes="${INPUT_THEMES:-dracula}"
 tz="${INPUT_TZ:-UTC}"
-top_repos="${INPUT_TOP_REPOS:-10}"
-commits_per_repo="${INPUT_COMMITS_PER_REPO:-100}"
+top_repos="${INPUT_TOP_REPOS:-0}"
+commits_per_repo="${INPUT_COMMITS_PER_REPO:-500}"
+include_forks="${INPUT_INCLUDE_FORKS:-false}"
+include_private="${INPUT_INCLUDE_PRIVATE:-false}"
 commit_changes="${INPUT_COMMIT_CHANGES:-false}"
 commit_message="${INPUT_COMMIT_MESSAGE:-chore: update ghstats cards}"
 commit_branch="${INPUT_COMMIT_BRANCH:-}"
@@ -34,7 +36,9 @@ ghstats \
   -themes "$themes" \
   -tz "$tz" \
   -top-repos "$top_repos" \
-  -commits-per-repo "$commits_per_repo"
+  -commits-per-repo "$commits_per_repo" \
+  -include-forks="$include_forks" \
+  -include-private="$include_private"
 
 if [ "$commit_changes" = "true" ]; then
   workspace="${GITHUB_WORKSPACE:-/github/workspace}"
