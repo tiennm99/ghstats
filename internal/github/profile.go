@@ -50,15 +50,16 @@ type profileGQL struct {
 	} `json:"user"`
 }
 
-// FetchProfile collects profile, stats and language data for the given user.
-// Repositories are paginated up to 10 pages (1000 owned repos) as a safety cap.
+// FetchProfile collects profile, stats and repos-per-language data for the
+// given user. Owned repos are paginated up to 10 pages (1000 repos) as a
+// safety cap.
 func (c *Client) FetchProfile(login string) (*Profile, error) {
 	if login == "" {
 		return nil, errors.New("empty user")
 	}
 
 	p := &Profile{Login: login}
-	langBytes := map[string]int64{}
+	reposPerLang := map[string]int64{}
 	langColor := map[string]string{}
 
 	var cursor *string
@@ -105,9 +106,22 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 		for _, r := range u.Repositories.Nodes {
 			p.TotalStars += r.StargazerCount
 			p.TotalForks += r.ForkCount
-			p.TopRepos = append(p.TopRepos, r.Name)
+
+			info := RepoInfo{Name: r.Name}
+			if r.PrimaryLanguage != nil {
+				info.PrimaryLanguage = r.PrimaryLanguage.Name
+				info.PrimaryColor = r.PrimaryLanguage.Color
+				reposPerLang[r.PrimaryLanguage.Name]++
+				if _, ok := langColor[r.PrimaryLanguage.Name]; !ok {
+					langColor[r.PrimaryLanguage.Name] = r.PrimaryLanguage.Color
+				}
+			}
+			p.TopRepos = append(p.TopRepos, info)
+
+			// Capture secondary language colors so productive-time's
+			// per-language aggregation can color them even if that language
+			// isn't the primary of any other repo.
 			for _, e := range r.Languages.Edges {
-				langBytes[e.Node.Name] += e.Size
 				if _, ok := langColor[e.Node.Name]; !ok {
 					langColor[e.Node.Name] = e.Node.Color
 				}
@@ -121,18 +135,19 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 		cursor = &end
 	}
 
-	p.Languages = sortLanguages(langBytes, langColor)
+	p.ReposByLanguage = sortLangStats(reposPerLang, langColor)
 	return p, nil
 }
 
-func sortLanguages(bytes map[string]int64, color map[string]string) []LangStat {
-	out := make([]LangStat, 0, len(bytes))
-	for name, b := range bytes {
-		out = append(out, LangStat{Name: name, Color: color[name], Bytes: b})
+// sortLangStats returns a slice sorted desc by value; ties break alphabetically.
+func sortLangStats(values map[string]int64, color map[string]string) []LangStat {
+	out := make([]LangStat, 0, len(values))
+	for name, v := range values {
+		out = append(out, LangStat{Name: name, Color: color[name], Value: v})
 	}
 	sort.Slice(out, func(i, j int) bool {
-		if out[i].Bytes != out[j].Bytes {
-			return out[i].Bytes > out[j].Bytes
+		if out[i].Value != out[j].Value {
+			return out[i].Value > out[j].Value
 		}
 		return out[i].Name < out[j].Name
 	})

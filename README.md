@@ -7,7 +7,8 @@ public data for a GitHub user and writes a themed set of SVGs you can embed in
 your profile README:
 
 - Profile details
-- Top languages
+- Repos per language (how many owned repos use each language as primary)
+- Most commit language (last year's commits attributed to each repo's primary language)
 - Stats (stars, commits, PRs, issues, PR reviews, contributed-to)
 - Productive time heatmap (weekday × hour)
 
@@ -45,9 +46,10 @@ Then embed the cards in your `README.md`:
 
 ```md
 ![profile](./output/dracula/0-profile-details.svg)
-![languages](./output/dracula/1-languages.svg)
-![stats](./output/dracula/2-stats.svg)
-![productive-time](./output/dracula/3-productive-time.svg)
+![repos-per-language](./output/dracula/1-repos-per-language.svg)
+![most-commit-language](./output/dracula/2-most-commit-language.svg)
+![stats](./output/dracula/3-stats.svg)
+![productive-time](./output/dracula/4-productive-time.svg)
 ```
 
 ### Action inputs
@@ -112,9 +114,10 @@ Run `ghstats -list-themes` for the full list. Built-ins include `default`,
 output/
   dracula/
     0-profile-details.svg
-    1-languages.svg
-    2-stats.svg
-    3-productive-time.svg
+    1-repos-per-language.svg
+    2-most-commit-language.svg
+    3-stats.svg
+    4-productive-time.svg
 ```
 
 ## Tokens & permissions

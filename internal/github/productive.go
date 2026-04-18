@@ -24,16 +24,21 @@ type productiveGQL struct {
 }
 
 // FetchProductive fills p.Productive with a [7][24] commit histogram over the
-// last year, gathered from the user's top-starred owned repos. Each repo is
-// sampled up to maxPerRepo commits to keep the cost bounded.
+// last year and p.CommitsByLanguage with commit counts attributed to each
+// repo's primary language. Commits are gathered from the given repos (usually
+// p.TopRepos[:N]); each repo is sampled up to maxPerRepo commits to keep the
+// cost bounded.
 //
-// The timezone loc is applied to CommittedDate so the heatmap reflects when the
-// user actually commits, not UTC.
-func (c *Client) FetchProductive(p *Profile, repos []string, loc *time.Location, maxPerRepo int) error {
+// The timezone loc is applied to CommittedDate so the heatmap reflects when
+// the user actually commits, not UTC.
+func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Location, maxPerRepo int) error {
 	if loc == nil {
 		loc = time.UTC
 	}
 	since := time.Now().AddDate(-1, 0, 0).UTC().Format(time.RFC3339)
+
+	commitsByLang := map[string]int64{}
+	langColor := map[string]string{}
 
 	for _, repo := range repos {
 		var cursor *string
@@ -44,7 +49,7 @@ func (c *Client) FetchProductive(p *Profile, repos []string, loc *time.Location,
 			}
 			vars := map[string]any{
 				"login":  p.Login,
-				"repo":   repo,
+				"repo":   repo.Name,
 				"userId": p.ID,
 				"since":  since,
 			}
@@ -68,6 +73,12 @@ func (c *Client) FetchProductive(p *Profile, repos []string, loc *time.Location,
 				}
 				tl := t.In(loc)
 				p.Productive[int(tl.Weekday())][tl.Hour()]++
+				if repo.PrimaryLanguage != "" {
+					commitsByLang[repo.PrimaryLanguage]++
+					if _, ok := langColor[repo.PrimaryLanguage]; !ok {
+						langColor[repo.PrimaryLanguage] = repo.PrimaryColor
+					}
+				}
 				seen++
 			}
 			if !h.PageInfo.HasNextPage {
@@ -77,5 +88,7 @@ func (c *Client) FetchProductive(p *Profile, repos []string, loc *time.Location,
 			cursor = &end
 		}
 	}
+
+	p.CommitsByLanguage = sortLangStats(commitsByLang, langColor)
 	return nil
 }

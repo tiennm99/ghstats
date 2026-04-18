@@ -28,22 +28,34 @@ type Profile struct {
 	TotalContributedTo int
 	TotalContributions int // lifetime contributions from calendar + restricted
 
-	// Sorted desc by bytes. Color is GitHub's linguist color or "" if absent.
-	Languages []LangStat
+	// Count of owned repos grouped by primary language, sorted desc by Value.
+	ReposByLanguage []LangStat
+
+	// Count of commits (last year, by this user) attributed to each repo's
+	// primary language, sorted desc. Populated by FetchProductive.
+	CommitsByLanguage []LangStat
 
 	// Commit-count histogram indexed by [day-of-week 0=Sunday][hour-of-day 0-23].
 	Productive [7][24]int
 
-	// TopRepos is the list of owned repo names sorted by stargazer count desc,
-	// populated by FetchProfile. Used as the seed set for FetchProductive.
-	TopRepos []string
+	// TopRepos are owned repos sorted by stargazer count desc. Populated by
+	// FetchProfile and consumed by FetchProductive.
+	TopRepos []RepoInfo
 }
 
-// LangStat is one row in the top-languages card.
+// LangStat is one row in a language breakdown card. Value is repo count or
+// commit count depending on which slice holds it.
 type LangStat struct {
 	Name  string
 	Color string
-	Bytes int64
+	Value int64
+}
+
+// RepoInfo is the minimal owned-repo summary used for downstream fetches.
+type RepoInfo struct {
+	Name            string
+	PrimaryLanguage string
+	PrimaryColor    string
 }
 
 // repoNode is the GraphQL shape of one repository node; kept here because

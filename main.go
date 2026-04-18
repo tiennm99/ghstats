@@ -64,7 +64,7 @@ func main() {
 			repos = repos[:*topRepos]
 		}
 		if err := client.FetchProductive(profile, repos, loc, *perRepo); err != nil {
-			fmt.Fprintf(os.Stderr, "warn: productive-time fetch: %v\n", err)
+			fmt.Fprintf(os.Stderr, "warn: productive-time + commits-per-language fetch: %v\n", err)
 		}
 	}
 

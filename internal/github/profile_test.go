@@ -2,19 +2,19 @@ package github
 
 import "testing"
 
-func TestSortLanguages(t *testing.T) {
-	bytes := map[string]int64{
-		"Go":         500,
-		"Python":     300,
-		"TypeScript": 500, // tie with Go → alphabetical wins
-		"HTML":       100,
+func TestSortLangStats(t *testing.T) {
+	values := map[string]int64{
+		"Go":         5,
+		"Python":     3,
+		"TypeScript": 5, // tie with Go → alphabetical wins
+		"HTML":       1,
 	}
 	colors := map[string]string{
 		"Go":         "#00ADD8",
 		"Python":     "#3572A5",
 		"TypeScript": "#3178c6",
 	}
-	got := sortLanguages(bytes, colors)
+	got := sortLangStats(values, colors)
 
 	wantOrder := []string{"Go", "TypeScript", "Python", "HTML"}
 	if len(got) != len(wantOrder) {

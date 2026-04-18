@@ -10,7 +10,7 @@ import (
 
 type productiveCard struct{}
 
-func (productiveCard) Filename() string { return "3-productive-time.svg" }
+func (productiveCard) Filename() string { return "4-productive-time.svg" }
 
 var weekdayLabels = [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 

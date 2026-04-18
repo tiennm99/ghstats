@@ -19,10 +19,14 @@ func TestRenderAll(t *testing.T) {
 		Following:   7,
 		PublicRepos: 42,
 		TotalStars:  1234,
-		Languages: []github.LangStat{
-			{Name: "Go", Color: "#00ADD8", Bytes: 5000},
-			{Name: "TypeScript", Color: "#3178c6", Bytes: 3000},
-			{Name: "Python", Color: "", Bytes: 2000},
+		ReposByLanguage: []github.LangStat{
+			{Name: "Go", Color: "#00ADD8", Value: 5},
+			{Name: "TypeScript", Color: "#3178c6", Value: 3},
+			{Name: "Python", Color: "", Value: 2},
+		},
+		CommitsByLanguage: []github.LangStat{
+			{Name: "Go", Color: "#00ADD8", Value: 420},
+			{Name: "Python", Color: "#3572A5", Value: 150},
 		},
 	}
 	p.Productive[2][14] = 7
@@ -39,9 +43,10 @@ func TestRenderAll(t *testing.T) {
 
 	want := []string{
 		"0-profile-details.svg",
-		"1-languages.svg",
-		"2-stats.svg",
-		"3-productive-time.svg",
+		"1-repos-per-language.svg",
+		"2-most-commit-language.svg",
+		"3-stats.svg",
+		"4-productive-time.svg",
 	}
 	for _, name := range want {
 		data, err := os.ReadFile(filepath.Join(dir, "dracula", name))

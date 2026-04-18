@@ -22,7 +22,8 @@ type Card interface {
 // Keep filename prefixes numeric so the output directory lists in a predictable order.
 var allCards = []Card{
 	profileCard{},
-	languagesCard{},
+	reposPerLanguageCard{},
+	mostCommitLanguageCard{},
 	statsCard{},
 	productiveCard{},
 }
