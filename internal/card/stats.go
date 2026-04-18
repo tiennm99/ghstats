@@ -12,35 +12,46 @@ type statsCard struct{}
 
 func (statsCard) Filename() string { return "3-stats.svg" }
 
+// statRow is one labeled-by-icon line in the stats card.
+type statRow struct {
+	icon  string
+	label string
+	value string
+}
+
 func (statsCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	const (
-		width  = 500
-		height = 220
+		width    = 500
+		height   = 220
+		rowX     = 25
+		rowY0    = 70
+		rowDY    = 24
+		iconSize = 14
+		valueX   = 475 // right-aligned x anchor
 	)
 
-	items := []struct{ label, value string }{
-		{"Total Stars", formatInt(p.TotalStars)},
-		{"Total Commits (last year)", formatInt(p.TotalCommits)},
-		{"Total PRs", formatInt(p.TotalPRs)},
-		{"Total Issues", formatInt(p.TotalIssues)},
-		{"Total PR Reviews", formatInt(p.TotalReviews)},
-		{"Contributed to (non-fork)", formatInt(p.TotalContributedTo)},
+	rows := []statRow{
+		{iconStar, "Total Stars", formatInt(p.TotalStars)},
+		{iconCommit, "Total Commits (last year)", formatInt(p.TotalCommits)},
+		{iconPR, "Total PRs", formatInt(p.TotalPRs)},
+		{iconIssue, "Total Issues", formatInt(p.TotalIssues)},
+		{iconReview, "Total PR Reviews", formatInt(p.TotalReviews)},
+		{iconRepos, "Contributed to (non-fork)", formatInt(p.TotalContributedTo)},
 	}
 
 	var b strings.Builder
 	b.WriteString(header(width, height, t.Background, t.Stroke, t.StrokeOpacity, t.Title, "Stats"))
 
-	// 2×3 grid: columns at 25 and 265, rows every 42px starting at y=80.
-	for i, it := range items {
-		col := i % 2
-		row := i / 2
-		x := 25 + col*240
-		y := 80 + row*42
+	scale := float64(iconSize) / 16.0
+	for i, r := range rows {
+		y := rowY0 + i*rowDY
 		fmt.Fprintf(&b, `
-  <text x="%d" y="%d" font-size="12" fill="%s">%s</text>
-  <text x="%d" y="%d" font-size="18" font-weight="600" fill="%s">%s</text>`,
-			x, y, t.Muted, escapeXML(it.label),
-			x, y+22, t.Accent, escapeXML(it.value))
+  <g transform="translate(%d,%.2f) scale(%.3f)" fill="%s">%s</g>
+  <text x="%d" y="%d" font-size="13" fill="%s">%s</text>
+  <text x="%d" y="%d" font-size="13" font-weight="600" fill="%s" text-anchor="end">%s</text>`,
+			rowX, float64(y-iconSize+2), scale, t.Muted, r.icon,
+			rowX+iconSize+10, y, t.Text, escapeXML(r.label),
+			valueX, y, t.Accent, escapeXML(r.value))
 	}
 
 	b.WriteString(footer)
