@@ -23,13 +23,13 @@ ghstats/
 │   │   ├── svg.go                       # escapeXML, formatInt, header, footer
 │   │   ├── axis.go                      # niceTicks (d3-style 1/2/5 × 10^k), formatTick
 │   │   ├── icons.go                     # Octicon path strings
-│   │   ├── profile.go                   # 0-profile-details
-│   │   ├── repos_per_language.go        # 1-repos-per-language
-│   │   ├── most_commit_language.go      # 2-most-commit-language
-│   │   ├── most_commit_language_all_time.go  # 6-most-commit-language-all-time
-│   │   ├── stats.go                     # 3-stats
-│   │   ├── productive.go                # 4-productive-time + 7-*-all-time
-│   │   ├── contributions.go             # 5-contributions + 8-*-all-time
+│   │   ├── profile.go                   # profile-details
+│   │   ├── repos_per_language.go        # repos-per-language
+│   │   ├── most_commit_language.go      # most-commit-language
+│   │   ├── most_commit_language_all_time.go  # most-commit-language-all-time
+│   │   ├── stats.go                     # stats
+│   │   ├── productive.go                # productive-time (+ all-time)
+│   │   ├── contributions.go             # contributions (+ all-time)
 │   │   ├── donut_chart.go               # renderDonutCard — shared by language cards
 │   │   └── card_test.go                 # Rendering + escape + format tests
 │   └── theme/

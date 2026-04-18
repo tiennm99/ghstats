@@ -42,11 +42,15 @@ func TestRenderAll(t *testing.T) {
 	}
 
 	want := []string{
-		"0-profile-details.svg",
-		"1-repos-per-language.svg",
-		"2-most-commit-language.svg",
-		"3-stats.svg",
-		"4-productive-time.svg",
+		"profile-details.svg",
+		"repos-per-language.svg",
+		"most-commit-language.svg",
+		"stats.svg",
+		"productive-time.svg",
+		"contributions.svg",
+		"most-commit-language-all-time.svg",
+		"productive-time-all-time.svg",
+		"contributions-all-time.svg",
 	}
 	for _, name := range want {
 		data, err := os.ReadFile(filepath.Join(dir, "dracula", name))
