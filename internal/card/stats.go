@@ -10,7 +10,7 @@ import (
 
 type statsCard struct{}
 
-func (statsCard) Filename() string { return "2-stats.svg" }
+func (statsCard) Filename() string { return "3-stats.svg" }
 
 func (statsCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	const (
