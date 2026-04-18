@@ -28,7 +28,7 @@ Distinguishing traits:
 - **Single binary**: no Node, no Ruby, no Docker needed for CLI usage.
 - **Seed-list sampling**: commit-history probes land on repos the user actually committed in (via `contributionsCollection.commitContributionsByRepository`), not top-starred or owned-only.
 - **All-time variants**: for every time-bounded card (most-commit-language, productive-time, contributions), there's a lifetime counterpart.
-- **Public-safe defaults**: forks and private repos are **off** by default; users opt in.
+- **Accurate defaults**: forks and private repos are **on** by default so cards reflect real activity; `-include-private` silently no-ops if the token lacks `repo` scope, so the default is safe for public runs too.
 
 ## Functional requirements
 

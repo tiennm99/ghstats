@@ -30,7 +30,7 @@ Applied in order: **YAGNI → KISS → DRY**.
 
 ### No hidden state
 
-- Profile fetchers mutate the `*Profile` argument in-place (`FetchContributionsAllTime(p, opts)`) — explicit ownership, no package-level caches.
+- Profile fetchers mutate the `*Profile` argument in-place (`FetchContributionsAllTime(ctx, p, opts)`) — explicit ownership, no package-level caches.
 - Renderers are pure functions of `(*Profile, theme.Theme)`. No side effects, no goroutines.
 
 ### Comments
@@ -58,7 +58,7 @@ Never write comments that describe what well-named code does (`// increment coun
 
 - Always XML-escape user-controlled strings through `escapeXML` (`&`, `<`, `>`, `"`, `'`).
 - Numbers formatted via `formatInt` with thousands separators.
-- Stable viewbox per card (`500×220` for most, `500×220` for profile too).
+- Stable viewbox per card (`340×200`) matching github-profile-summary-cards.
 - No `<script>` tags, no event handlers. Cards are pure markup.
 
 ## Testing

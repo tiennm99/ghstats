@@ -108,14 +108,20 @@ runs:
 2. `release.yml` runs `go vet` + `go test` as a gate before the docker and
    binaries jobs. If tests fail, no artifacts ship.
 3. On green, GHCR push + cross-platform binary artifacts happen automatically.
-4. Docker base images and third-party actions are SHA-pinned (with version
+4. The `update-major-tag` job force-moves the floating major tag (e.g. `v1`)
+   to this release's commit after test + docker + binaries all pass.
+   Consumers pinned to `tiennm99/ghstats@v1` pick up the release on their
+   next Action run without a workflow edit.
+5. Docker base images and third-party actions are SHA-pinned (with version
    comments) so mutable-tag changes upstream can't rewrite a released image.
-5. **Marketplace publishing (one-time per repo):** GitHub only exposes the
+6. **Marketplace publishing (one-time per repo):** GitHub only exposes the
    "Publish this Action to the GitHub Marketplace" toggle on the Release
    web UI — there is no CLI flag. Open the newly created release at
    `https://github.com/tiennm99/ghstats/releases/tag/vX.Y.Z/edit`, tick the
    marketplace checkbox, accept the terms, and re-publish. Subsequent
-   releases inherit marketplace visibility automatically.
+   releases inherit marketplace visibility automatically. The Marketplace
+   listing name is `ghstats-cards` (set in `action.yml`) because the bare
+   `ghstats` is already taken on the Marketplace.
 
 ## Rollback
 

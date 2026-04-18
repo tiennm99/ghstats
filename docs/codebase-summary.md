@@ -97,13 +97,14 @@ commitHistoryQuery ──► Productive + CommitsByLanguage (+ AllTime variants)
 
 ## Test coverage
 
-- `internal/card/card_test.go` — RenderAll produces 9 valid SVGs; escape + formatInt spot-checks.
+- `internal/card/card_test.go` — `RenderAll` produces 9 valid SVGs; XML escape through real render pipeline; `formatInt` cases; `TestDonutSingleSlice` (guards the empty-arc regression); `TestDonutEmpty` (no-data fallback).
 - `internal/github/profile_test.go` — `sortLangStats` ordering and tiebreak.
+- `main_test.go` — `TestUTCOffsetLabel` covers UTC, Asia/Saigon, half-hour (Kolkata), quarter-hour (Kathmandu) zones.
 
 No network-touching tests; real runs verified via `-token` + local build.
 
 ## Naming conventions
 
 - Go files use snake_case for multi-word names (`repos_per_language.go`, `contributions_all_time.go`).
-- Cards' `Filename()` returns the numbered SVG output name — consumers sort lexicographically.
+- Cards' `Filename()` returns a plain kebab-case name (`profile-details.svg`, `most-commit-language-all-time.svg`, …). Embedders reference by name, so no numeric prefix is needed.
 - Themes in snake_case to match upstream (`github_dark`, `nord_bright`).
