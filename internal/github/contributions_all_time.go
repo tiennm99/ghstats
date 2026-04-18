@@ -18,24 +18,34 @@ type contributionYearGQL struct {
 					} `json:"contributionDays"`
 				} `json:"weeks"`
 			} `json:"contributionCalendar"`
+			CommitContributionsByRepository []struct {
+				Contributions struct {
+					TotalCount int `json:"totalCount"`
+				} `json:"contributions"`
+				Repository repoNode `json:"repository"`
+			} `json:"commitContributionsByRepository"`
 		} `json:"contributionsCollection"`
 	} `json:"user"`
 }
 
 // FetchContributionsAllTime iterates p.ContributionYears and issues one
-// contributionsCollection query per year, concatenating the daily calendar
-// into p.DailyContributionsAllTime and accumulating commit counts into
-// p.TotalCommitsAllTime.
+// contributionsCollection query per year. Each year's payload contributes:
 //
-// Cost: one GraphQL call per active year (typically 1–10 per user).
-func (c *Client) FetchContributionsAllTime(p *Profile) error {
+//   - Days → p.DailyContributionsAllTime
+//   - Commit count → p.TotalCommitsAllTime
+//   - Repos the user committed in → p.SeedRepos (deduplicated by owner/name)
+//
+// Fork and private repos are filtered client-side per opts so the caller can
+// run the same pipeline with different visibility policies.
+func (c *Client) FetchContributionsAllTime(p *Profile, opts FetchOptions) error {
 	years := append([]int(nil), p.ContributionYears...)
 	sort.Ints(years) // ascending so the concatenated series is oldest→newest
+
+	seen := map[string]int{} // "owner/name" → index in p.SeedRepos
 
 	for _, y := range years {
 		from := time.Date(y, 1, 1, 0, 0, 0, 0, time.UTC)
 		to := time.Date(y, 12, 31, 23, 59, 59, 0, time.UTC)
-		// Clamp the current year's window to now so GitHub doesn't reject it.
 		if now := time.Now().UTC(); to.After(now) {
 			to = now
 		}
@@ -66,6 +76,23 @@ func (c *Client) FetchContributionsAllTime(p *Profile) error {
 					Count: d.ContributionCount,
 				})
 			}
+		}
+
+		for _, cr := range cc.CommitContributionsByRepository {
+			r := cr.Repository
+			if r.IsFork && !opts.IncludeForks {
+				continue
+			}
+			if r.IsPrivate && !opts.IncludePrivate {
+				continue
+			}
+			info := r.toRepoInfo(p.Login)
+			key := info.Owner + "/" + info.Name
+			if _, ok := seen[key]; ok {
+				continue
+			}
+			seen[key] = len(p.SeedRepos)
+			p.SeedRepos = append(p.SeedRepos, info)
 		}
 	}
 	return nil

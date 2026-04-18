@@ -57,9 +57,16 @@ type Profile struct {
 	// all-time area chart can show history beyond the default 1-year window.
 	DailyContributionsAllTime []DailyContribution
 
-	// TopRepos are owned repos sorted by stargazer count desc. Populated by
-	// FetchProfile and consumed by FetchProductive.
+	// TopRepos are owned non-fork repos sorted by stargazer count desc,
+	// populated by FetchProfile. Used for the profile's stars/forks totals
+	// and the repos-per-language card.
 	TopRepos []RepoInfo
+
+	// SeedRepos are the repos where the user actually committed, unioned
+	// across every contribution year via commitContributionsByRepository.
+	// Used by FetchProductive so commit-history probes land where there is
+	// signal instead of across the long tail of empty owned repos.
+	SeedRepos []RepoInfo
 
 	// ContributionYears lists every calendar year the user has been active
 	// on GitHub, newest first. Used by FetchContributionsAllTime to iterate
@@ -86,9 +93,13 @@ type LangStat struct {
 	Value int64
 }
 
-// RepoInfo is the minimal owned-repo summary used for downstream fetches.
+// RepoInfo is the minimal repo summary used for downstream fetches. Owner is
+// kept so the history query can target forks / repos belonging to other users.
 type RepoInfo struct {
+	Owner           string
 	Name            string
+	IsPrivate       bool
+	IsFork          bool
 	PrimaryLanguage string
 	PrimaryColor    string
 	// Languages is the repo's language byte breakdown as reported by GitHub
@@ -108,8 +119,13 @@ type LangEdge struct {
 // it's shared by the profile fetcher and the productive-time fetcher.
 type repoNode struct {
 	Name            string `json:"name"`
+	IsPrivate       bool   `json:"isPrivate"`
+	IsFork          bool   `json:"isFork"`
 	StargazerCount  int    `json:"stargazerCount"`
 	ForkCount       int    `json:"forkCount"`
+	Owner           *struct {
+		Login string `json:"login"`
+	} `json:"owner"`
 	PrimaryLanguage *struct {
 		Name  string `json:"name"`
 		Color string `json:"color"`
@@ -123,4 +139,31 @@ type repoNode struct {
 			} `json:"node"`
 		} `json:"edges"`
 	} `json:"languages"`
+}
+
+// toRepoInfo converts the GraphQL shape into our public RepoInfo, defaulting
+// owner to the given login if the node omits it (profile query doesn't
+// request owner since it's implicit on user.repositories).
+func (r repoNode) toRepoInfo(defaultOwner string) RepoInfo {
+	info := RepoInfo{
+		Owner:     defaultOwner,
+		Name:      r.Name,
+		IsPrivate: r.IsPrivate,
+		IsFork:    r.IsFork,
+	}
+	if r.Owner != nil {
+		info.Owner = r.Owner.Login
+	}
+	if r.PrimaryLanguage != nil {
+		info.PrimaryLanguage = r.PrimaryLanguage.Name
+		info.PrimaryColor = r.PrimaryLanguage.Color
+	}
+	for _, e := range r.Languages.Edges {
+		info.Languages = append(info.Languages, LangEdge{
+			Name:  e.Node.Name,
+			Color: e.Node.Color,
+			Bytes: e.Size,
+		})
+	}
+	return info
 }

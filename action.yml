@@ -28,13 +28,21 @@ inputs:
     required: false
     default: UTC
   top_repos:
-    description: Number of top-starred owned repos to sample for commit histogram (0 to skip)
+    description: Optional cap on seed repos probed for commit history (0 = unlimited)
     required: false
-    default: "10"
+    default: "0"
   commits_per_repo:
-    description: Max commits sampled per repo for the heatmap
+    description: Max commits sampled per repo (covers last-year and all-time aggregates)
     required: false
-    default: "100"
+    default: "500"
+  include_forks:
+    description: Include forked repos in stats and commit probing
+    required: false
+    default: "false"
+  include_private:
+    description: Include private repos (requires PAT with repo scope)
+    required: false
+    default: "false"
   commit_changes:
     description: Whether to commit the generated cards back to the repo
     required: false

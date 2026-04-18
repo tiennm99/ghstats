@@ -56,8 +56,12 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 			if seen >= maxPerRepo {
 				break
 			}
+			owner := repo.Owner
+			if owner == "" {
+				owner = p.Login
+			}
 			vars := map[string]any{
-				"login":  p.Login,
+				"owner":  owner,
 				"repo":   repo.Name,
 				"userId": p.ID,
 			}
