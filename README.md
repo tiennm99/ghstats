@@ -47,8 +47,8 @@ jobs:
           token: ${{ secrets.GHSTATS_TOKEN }}   # classic PAT with read:user + repo
           themes: dracula,github_dark,tokyonight
           tz: Asia/Saigon
-          include_forks: "false"
-          include_private: "false"
+          include_forks: "true"
+          include_private: "true"
           commit_changes: "true"
 ```
 
@@ -77,8 +77,8 @@ Then embed the cards in your `README.md`:
 | `tz`               | `UTC`                            | IANA tz for the productive-time card (e.g. `Asia/Saigon`)               |
 | `top_repos`        | `0`                              | Optional cap on seed repos probed for commit history (`0` = unlimited)  |
 | `commits_per_repo` | `500`                            | Max commits sampled per repo (covers last-year and all-time aggregates) |
-| `include_forks`    | `false`                          | Include forked repos in stats and commit probing                        |
-| `include_private`  | `false`                          | Include private repos (requires PAT with `repo` scope)                  |
+| `include_forks`    | `true`                           | Include forked repos in stats and commit probing                        |
+| `include_private`  | `true`                           | Include private repos (requires PAT with `repo` scope; silently no-op otherwise) |
 | `commit_changes`   | `false`                          | Commit generated cards back to the repo                                 |
 | `commit_message`   | `chore: update ghstats cards`    | Commit message                                                          |
 | `commit_branch`    | *(current ref)*                  | Target branch for auto-commit                                           |
@@ -115,8 +115,8 @@ ghstats -user tiennm99 -themes dracula,github_dark -tz Asia/Saigon -out output
 | `-tz`               | `Local`         | IANA timezone for productive-time cards                                |
 | `-top-repos`        | `0`             | Optional cap on seed repos probed (`0` = unlimited)                    |
 | `-commits-per-repo` | `500`           | Max commits sampled per repo                                           |
-| `-include-forks`    | `false`         | Include forked repos in the stats                                      |
-| `-include-private`  | `false`         | Include private repos (requires `repo` PAT scope)                      |
+| `-include-forks`    | `true`          | Include forked repos in the stats                                      |
+| `-include-private`  | `true`          | Include private repos (requires `repo` PAT scope; silently no-op otherwise) |
 | `-list-themes`      |                 | Print available theme ids and exit                                     |
 
 ## How attribution works
@@ -164,8 +164,10 @@ themes are rebuilt on each run and gitignored.
 The default `${{ github.token }}` can read public user data but will not see
 your private-repo commits. For accurate stats, create a **classic** personal
 access token with `read:user` and `repo`, save it as a repo secret (e.g.
-`GHSTATS_TOKEN`), and pass it via the `token` input. Then pair with
-`include_private: "true"` to have those commits actually counted.
+`GHSTATS_TOKEN`), and pass it via the `token` input. `include_private`
+defaults to `true` so those commits are counted automatically once the token
+has `repo` scope; pass `include_private: "false"` if you want to keep private
+work out of the rendered cards even when the token can see it.
 
 ## Credits & inspiration
 

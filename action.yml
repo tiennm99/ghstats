@@ -38,11 +38,11 @@ inputs:
   include_forks:
     description: Include forked repos in stats and commit probing
     required: false
-    default: "false"
+    default: "true"
   include_private:
-    description: Include private repos (requires PAT with repo scope)
+    description: Include private repos (requires PAT with repo scope; silently no-op otherwise)
     required: false
-    default: "false"
+    default: "true"
   commit_changes:
     description: Whether to commit the generated cards back to the repo
     required: false
