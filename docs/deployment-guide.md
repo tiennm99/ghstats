@@ -51,15 +51,15 @@ Create one at <https://github.com/settings/tokens> → "Generate new token (clas
 ### Embedding in README
 
 ```md
-![profile](./output/dracula/0-profile-details.svg)
-![repos-per-language](./output/dracula/1-repos-per-language.svg)
-![most-commit-language](./output/dracula/2-most-commit-language.svg)
-![stats](./output/dracula/3-stats.svg)
-![productive-time](./output/dracula/4-productive-time.svg)
-![contributions](./output/dracula/5-contributions.svg)
-![most-commit-language-all-time](./output/dracula/6-most-commit-language-all-time.svg)
-![productive-time-all-time](./output/dracula/7-productive-time-all-time.svg)
-![contributions-all-time](./output/dracula/8-contributions-all-time.svg)
+![profile](./output/dracula/profile-details.svg)
+![repos-per-language](./output/dracula/repos-per-language.svg)
+![most-commit-language](./output/dracula/most-commit-language.svg)
+![stats](./output/dracula/stats.svg)
+![productive-time](./output/dracula/productive-time.svg)
+![contributions](./output/dracula/contributions.svg)
+![most-commit-language-all-time](./output/dracula/most-commit-language-all-time.svg)
+![productive-time-all-time](./output/dracula/productive-time-all-time.svg)
+![contributions-all-time](./output/dracula/contributions-all-time.svg)
 ```
 
 The Action commits SVGs to `output/<theme>/` on the default branch. GitHub serves them from the raw URL the README references.

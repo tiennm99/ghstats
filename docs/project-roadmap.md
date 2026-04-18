@@ -20,7 +20,7 @@
 
 - Unified commit-history fetch splits into last-year and all-time buckets.
 - Per-year `contributionsCollection` loop yields `DailyContributionsAllTime` + `TotalCommitsAllTime`.
-- Three new cards: 6-most-commit-language-all-time, 7-productive-time-all-time, 8-contributions-all-time.
+- Three new cards: most-commit-language-all-time, productive-time-all-time, contributions-all-time.
 - Stats card gains a lifetime commits row.
 
 ## Phase 4 — Accurate repo sampling (✅ done)

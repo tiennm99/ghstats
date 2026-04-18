@@ -10,7 +10,7 @@ import (
 
 type productiveCard struct{}
 
-func (productiveCard) Filename() string { return "4-productive-time.svg" }
+func (productiveCard) Filename() string { return "productive-time.svg" }
 
 func (productiveCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	return renderProductiveTime(productiveTitle("last year", p.UTCOffsetLabel), p.Productive, t), nil
@@ -18,7 +18,7 @@ func (productiveCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 
 type productiveAllTimeCard struct{}
 
-func (productiveAllTimeCard) Filename() string { return "7-productive-time-all-time.svg" }
+func (productiveAllTimeCard) Filename() string { return "productive-time-all-time.svg" }
 
 func (productiveAllTimeCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	return renderProductiveTime(productiveTitle("all time", p.UTCOffsetLabel), p.ProductiveAllTime, t), nil

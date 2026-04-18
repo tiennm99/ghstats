@@ -55,15 +55,15 @@ jobs:
 Then embed the cards in your `README.md`:
 
 ```md
-![profile](./output/dracula/0-profile-details.svg)
-![repos-per-language](./output/dracula/1-repos-per-language.svg)
-![most-commit-language](./output/dracula/2-most-commit-language.svg)
-![stats](./output/dracula/3-stats.svg)
-![productive-time](./output/dracula/4-productive-time.svg)
-![contributions](./output/dracula/5-contributions.svg)
-![most-commit-language-all-time](./output/dracula/6-most-commit-language-all-time.svg)
-![productive-time-all-time](./output/dracula/7-productive-time-all-time.svg)
-![contributions-all-time](./output/dracula/8-contributions-all-time.svg)
+![profile](./output/dracula/profile-details.svg)
+![repos-per-language](./output/dracula/repos-per-language.svg)
+![most-commit-language](./output/dracula/most-commit-language.svg)
+![stats](./output/dracula/stats.svg)
+![productive-time](./output/dracula/productive-time.svg)
+![contributions](./output/dracula/contributions.svg)
+![most-commit-language-all-time](./output/dracula/most-commit-language-all-time.svg)
+![productive-time-all-time](./output/dracula/productive-time-all-time.svg)
+![contributions-all-time](./output/dracula/contributions-all-time.svg)
 ```
 
 ### Action inputs
@@ -145,15 +145,15 @@ github-profile-summary-cards). Built-ins include `default`, `dark`, `dracula`,
 ```
 output/
   dracula/
-    0-profile-details.svg
-    1-repos-per-language.svg
-    2-most-commit-language.svg
-    3-stats.svg
-    4-productive-time.svg
-    5-contributions.svg
-    6-most-commit-language-all-time.svg
-    7-productive-time-all-time.svg
-    8-contributions-all-time.svg
+    profile-details.svg
+    repos-per-language.svg
+    most-commit-language.svg
+    stats.svg
+    productive-time.svg
+    contributions.svg
+    most-commit-language-all-time.svg
+    productive-time-all-time.svg
+    contributions-all-time.svg
 ```
 
 Only the `dracula` theme is tracked in git as a reference sample; other

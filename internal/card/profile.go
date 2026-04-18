@@ -11,7 +11,7 @@ import (
 
 type profileCard struct{}
 
-func (profileCard) Filename() string { return "0-profile-details.svg" }
+func (profileCard) Filename() string { return "profile-details.svg" }
 
 // profileRow is one labeled-by-icon line in the profile card.
 type profileRow struct {

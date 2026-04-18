@@ -12,14 +12,14 @@ import (
 
 // Card renders one SVG for a Profile under the given theme.
 type Card interface {
-	// Filename is the on-disk basename (e.g. "0-profile-details.svg").
+	// Filename is the on-disk basename (e.g. "profile-details.svg").
 	Filename() string
 	// SVG returns the rendered SVG bytes.
 	SVG(p *github.Profile, t theme.Theme) ([]byte, error)
 }
 
-// allCards is the ordered list rendered by RenderAll.
-// Keep filename prefixes numeric so the output directory lists in a predictable order.
+// allCards is the ordered list rendered by RenderAll. Filenames are plain
+// kebab-case — README authors embed them by name, not by lexicographic order.
 var allCards = []Card{
 	profileCard{},
 	reposPerLanguageCard{},

@@ -8,7 +8,7 @@ import (
 type mostCommitLanguageAllTimeCard struct{}
 
 func (mostCommitLanguageAllTimeCard) Filename() string {
-	return "6-most-commit-language-all-time.svg"
+	return "most-commit-language-all-time.svg"
 }
 
 func (mostCommitLanguageAllTimeCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {

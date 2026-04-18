@@ -11,7 +11,7 @@ import (
 
 type contributionsCard struct{}
 
-func (contributionsCard) Filename() string { return "5-contributions.svg" }
+func (contributionsCard) Filename() string { return "contributions.svg" }
 
 func (contributionsCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	return renderContributions("Contributions (last year)", p.DailyContributions, t), nil
@@ -19,7 +19,7 @@ func (contributionsCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 
 type contributionsAllTimeCard struct{}
 
-func (contributionsAllTimeCard) Filename() string { return "8-contributions-all-time.svg" }
+func (contributionsAllTimeCard) Filename() string { return "contributions-all-time.svg" }
 
 func (contributionsAllTimeCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	return renderContributions("Contributions (all time)", p.DailyContributionsAllTime, t), nil

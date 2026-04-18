@@ -10,7 +10,7 @@ import (
 
 type statsCard struct{}
 
-func (statsCard) Filename() string { return "3-stats.svg" }
+func (statsCard) Filename() string { return "stats.svg" }
 
 // statRow is one labeled-by-icon line in the stats card.
 type statRow struct {
