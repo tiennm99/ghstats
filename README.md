@@ -2,9 +2,17 @@
 
 > Generate SVG cards summarizing a GitHub user's profile — written in Go.
 
+[![Marketplace](https://img.shields.io/badge/Marketplace-ghstats--cards-2f81f7?logo=github)](https://github.com/marketplace/actions/ghstats-cards)
+[![Release](https://img.shields.io/github/v/release/tiennm99/ghstats?color=blue)](https://github.com/tiennm99/ghstats/releases/latest)
+[![License](https://img.shields.io/github/license/tiennm99/ghstats?color=green)](./LICENSE)
+
 `ghstats` is a single-binary CLI (and a GitHub Action wrapping it) that fetches
 data for a GitHub user and writes a themed set of SVGs you can embed in your
-profile README:
+profile README.
+
+Marketplace listing: **[ghstats-cards](https://github.com/marketplace/actions/ghstats-cards)** · Source: [`tiennm99/ghstats`](https://github.com/tiennm99/ghstats)
+
+Cards rendered:
 
 | # | Card | What it shows |
 | --- | --- | --- |
