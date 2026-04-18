@@ -2,6 +2,7 @@ package card
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/tiennm99/ghstats/internal/github"
 	"github.com/tiennm99/ghstats/internal/theme"
@@ -12,11 +13,36 @@ type statsCard struct{}
 func (statsCard) Filename() string { return "2-stats.svg" }
 
 func (statsCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
-	// TODO: totals for stars, commits, PRs, issues, contributed-to repos.
-	svg := fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
-  <rect width="100%%" height="100%%" fill="%s"/>
-  <text x="20" y="40" fill="%s" font-family="sans-serif" font-size="20">Stats</text>
-  <text x="20" y="80" fill="%s" font-family="sans-serif" font-size="12">%d public repos · %d followers · %d following</text>
-</svg>`, t.Background, t.Title, t.Text, p.PublicRepos, p.Followers, p.Following)
-	return []byte(svg), nil
+	const (
+		width  = 500
+		height = 220
+	)
+
+	items := []kv{
+		{"Total Stars", formatInt(p.TotalStars)},
+		{"Total Commits (last year)", formatInt(p.TotalCommits)},
+		{"Total PRs", formatInt(p.TotalPRs)},
+		{"Total Issues", formatInt(p.TotalIssues)},
+		{"Total PR Reviews", formatInt(p.TotalReviews)},
+		{"Contributed to (non-fork)", formatInt(p.TotalContributedTo)},
+	}
+
+	var b strings.Builder
+	b.WriteString(header(width, height, t.Background, t.Title, "Stats"))
+
+	// 2×3 grid: columns at 25 and 265, rows every 42px starting at y=80.
+	for i, it := range items {
+		col := i % 2
+		row := i / 2
+		x := 25 + col*240
+		y := 80 + row*42
+		fmt.Fprintf(&b, `
+  <text x="%d" y="%d" font-size="12" fill="%s">%s</text>
+  <text x="%d" y="%d" font-size="18" font-weight="600" fill="%s">%s</text>`,
+			x, y, t.Muted, escapeXML(it.label),
+			x, y+22, t.Accent, escapeXML(it.value))
+	}
+
+	b.WriteString(footer)
+	return []byte(b.String()), nil
 }

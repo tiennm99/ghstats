@@ -1,0 +1,61 @@
+name: ghstats
+description: Generate GitHub profile summary SVG cards (profile, languages, stats, productive time)
+author: tiennm99
+branding:
+  icon: bar-chart-2
+  color: purple
+
+inputs:
+  user:
+    description: GitHub username to summarize
+    required: true
+  token:
+    description: |
+      Personal access token (classic PAT) with at least `read:user` and `repo` scopes.
+      The default GITHUB_TOKEN works for public repos but has no access to private stats.
+    required: false
+    default: ${{ github.token }}
+  out:
+    description: Output directory for the generated SVG cards
+    required: false
+    default: output
+  themes:
+    description: Comma-separated theme ids, or `all` to render every theme
+    required: false
+    default: dracula
+  tz:
+    description: IANA timezone for the productive-time heatmap (e.g. Asia/Saigon)
+    required: false
+    default: UTC
+  top_repos:
+    description: Number of top-starred owned repos to sample for commit histogram (0 to skip)
+    required: false
+    default: "10"
+  commits_per_repo:
+    description: Max commits sampled per repo for the heatmap
+    required: false
+    default: "100"
+  commit_changes:
+    description: Whether to commit the generated cards back to the repo
+    required: false
+    default: "false"
+  commit_message:
+    description: Commit message used when commit_changes is true
+    required: false
+    default: "chore: update ghstats cards"
+  commit_branch:
+    description: Branch to commit to (defaults to the current ref)
+    required: false
+    default: ""
+  author_name:
+    description: Git author name for auto-commit
+    required: false
+    default: "github-actions[bot]"
+  author_email:
+    description: Git author email for auto-commit
+    required: false
+    default: "41898282+github-actions[bot]@users.noreply.github.com"
+
+runs:
+  using: docker
+  image: Dockerfile
