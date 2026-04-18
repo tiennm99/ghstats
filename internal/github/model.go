@@ -56,6 +56,17 @@ type RepoInfo struct {
 	Name            string
 	PrimaryLanguage string
 	PrimaryColor    string
+	// Languages is the repo's language byte breakdown as reported by GitHub
+	// linguist. Used to attribute each commit fractionally across all
+	// languages the repo contains, rather than crediting only the primary.
+	Languages []LangEdge
+}
+
+// LangEdge is a single entry in a repo's language-bytes breakdown.
+type LangEdge struct {
+	Name  string
+	Color string
+	Bytes int64
 }
 
 // repoNode is the GraphQL shape of one repository node; kept here because
