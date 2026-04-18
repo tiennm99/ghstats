@@ -30,7 +30,15 @@ query($login: String!, $after: String) {
       totalPullRequestReviewContributions
       totalRepositoryContributions
       restrictedContributionsCount
-      contributionCalendar { totalContributions }
+      contributionCalendar {
+        totalContributions
+        weeks {
+          contributionDays {
+            contributionCount
+            date
+          }
+        }
+      }
     }
     repositories(
       first: 100

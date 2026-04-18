@@ -36,6 +36,12 @@ type profileGQL struct {
 			RestrictedContributionsCount        int `json:"restrictedContributionsCount"`
 			ContributionCalendar                struct {
 				TotalContributions int `json:"totalContributions"`
+				Weeks              []struct {
+					ContributionDays []struct {
+						ContributionCount int    `json:"contributionCount"`
+						Date              string `json:"date"`
+					} `json:"contributionDays"`
+				} `json:"weeks"`
 			} `json:"contributionCalendar"`
 		} `json:"contributionsCollection"`
 
@@ -101,6 +107,20 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 			p.TotalCommits = cc.TotalCommitContributions
 			p.TotalReviews = cc.TotalPullRequestReviewContributions
 			p.TotalContributions = cc.ContributionCalendar.TotalContributions + cc.RestrictedContributionsCount
+
+			// Flatten week → day into a linear daily series sorted by date.
+			for _, w := range cc.ContributionCalendar.Weeks {
+				for _, d := range w.ContributionDays {
+					t, err := time.Parse("2006-01-02", d.Date)
+					if err != nil {
+						continue
+					}
+					p.DailyContributions = append(p.DailyContributions, DailyContribution{
+						Date:  t,
+						Count: d.ContributionCount,
+					})
+				}
+			}
 		}
 
 		for _, r := range u.Repositories.Nodes {

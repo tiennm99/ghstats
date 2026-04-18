@@ -38,9 +38,20 @@ type Profile struct {
 	// Commit counts grouped by hour-of-day (0-23) in the configured timezone.
 	Productive [24]int
 
+	// DailyContributions is the raw per-day contribution calendar covering
+	// the most recent year. The area chart aggregates it into monthly
+	// buckets; kept granular here so any downstream card can re-bin freely.
+	DailyContributions []DailyContribution
+
 	// TopRepos are owned repos sorted by stargazer count desc. Populated by
 	// FetchProfile and consumed by FetchProductive.
 	TopRepos []RepoInfo
+}
+
+// DailyContribution is a single day in the contributions calendar.
+type DailyContribution struct {
+	Date  time.Time
+	Count int
 }
 
 // LangStat is one row in a language breakdown card. Value is repo count or
