@@ -2,13 +2,72 @@
 
 > Generate SVG cards summarizing a GitHub user's profile — written in Go.
 
-`ghstats` is a single-binary CLI that fetches public data for a GitHub user and writes a themed set of SVGs (profile details, top languages, stats, productive time) you can embed in your README.
+`ghstats` is a single-binary CLI (and a GitHub Action wrapping it) that fetches
+public data for a GitHub user and writes a themed set of SVGs you can embed in
+your profile README:
 
-## Status
+- Profile details
+- Top languages
+- Stats (stars, commits, PRs, issues, PR reviews, contributed-to)
+- Productive time heatmap (weekday × hour)
 
-⚠️ Early work-in-progress. Skeleton only — cards render placeholder SVGs. Roadmap below.
+## Use as a GitHub Action (recommended)
 
-## Install
+Drop this in `.github/workflows/ghstats.yml` in your **profile repo** (the one
+named after your username):
+
+```yaml
+name: ghstats
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: tiennm99/ghstats@v1
+        with:
+          user: ${{ github.repository_owner }}
+          token: ${{ secrets.GHSTATS_TOKEN }}   # classic PAT with read:user + repo
+          themes: dracula,github-dark,tokyonight
+          tz: Asia/Saigon
+          commit_changes: "true"
+```
+
+Then embed the cards in your `README.md`:
+
+```md
+![profile](./output/dracula/0-profile-details.svg)
+![languages](./output/dracula/1-languages.svg)
+![stats](./output/dracula/2-stats.svg)
+![productive-time](./output/dracula/3-productive-time.svg)
+```
+
+### Action inputs
+
+| Input              | Default                          | Description                                              |
+| ------------------ | -------------------------------- | -------------------------------------------------------- |
+| `user`             | —                                | GitHub username (required)                               |
+| `token`            | `${{ github.token }}`            | PAT with `read:user` + `repo` for private repo stats     |
+| `out`              | `output`                         | Output directory                                         |
+| `themes`           | `dracula`                        | Comma-separated theme ids, or `all`                      |
+| `tz`               | `UTC`                            | IANA tz for the productive-time card (e.g. `Asia/Saigon`)|
+| `top_repos`        | `10`                             | Owned repos sampled for commit heatmap (`0` to skip)     |
+| `commits_per_repo` | `100`                            | Max commits sampled per repo                             |
+| `commit_changes`   | `false`                          | Commit generated cards back to the repo                  |
+| `commit_message`   | `chore: update ghstats cards`    | Commit message                                           |
+| `commit_branch`    | *(current ref)*                  | Target branch for auto-commit                            |
+| `author_name`      | `github-actions[bot]`            | Commit author                                            |
+| `author_email`     | `…@users.noreply.github.com`     | Commit email                                             |
+
+## Use as a CLI
 
 ```sh
 go install github.com/tiennm99/ghstats@latest
@@ -22,21 +81,30 @@ cd ghstats
 go build -o ghstats .
 ```
 
-## Usage
+Then:
 
 ```sh
-export GITHUB_TOKEN=ghp_xxx       # PAT with `repo` + `read:user` for private repo stats
-ghstats -user tiennm99 -theme dracula -out output
+export GITHUB_TOKEN=ghp_xxx
+ghstats -user tiennm99 -themes dracula,github-dark -tz Asia/Saigon -out output
 ```
 
-Flags:
+| Flag                | Default         | Description                                       |
+| ------------------- | --------------- | ------------------------------------------------- |
+| `-user`             | *(required)*    | GitHub username                                   |
+| `-token`            | `$GITHUB_TOKEN` | Personal access token                             |
+| `-out`              | `output`        | Output directory (`<out>/<theme>/…svg`)           |
+| `-themes`           | `dracula`       | Comma-separated theme ids, or `all`               |
+| `-tz`               | `Local`         | IANA timezone for productive-time heatmap         |
+| `-top-repos`        | `10`            | Owned repos sampled for heatmap (`0` to skip)     |
+| `-commits-per-repo` | `100`           | Max commits sampled per repo                      |
+| `-list-themes`      |                 | Print available theme ids and exit                |
 
-| Flag     | Default                 | Description                                      |
-| -------- | ----------------------- | ------------------------------------------------ |
-| `-user`  | (required)              | GitHub username                                  |
-| `-token` | `$GITHUB_TOKEN`         | Personal access token                            |
-| `-out`   | `output`                | Output directory (cards land at `<out>/<theme>`) |
-| `-theme` | `dracula`               | `dracula`, `default`, `github`                   |
+## Themes
+
+Run `ghstats -list-themes` for the full list. Built-ins include `default`,
+`dark`, `dracula`, `github`, `github-dark`, `tokyonight`, `onedark`, `nord`,
+`gruvbox`, `radical`, `synthwave`, `monokai`, `solarized-dark`,
+`solarized-light`, `transparent`, and more.
 
 ## Output
 
@@ -49,35 +117,18 @@ output/
     3-productive-time.svg
 ```
 
-Embed in a README:
+## Tokens & permissions
 
-```md
-![profile](./output/dracula/0-profile-details.svg)
-![languages](./output/dracula/1-languages.svg)
-```
-
-## Roadmap
-
-- [ ] GitHub GraphQL + REST client (`internal/github`)
-  - [ ] Profile basics, followers, repos
-  - [ ] Commit histogram for productive time
-  - [ ] Language bytes aggregation with `linguist-vendored` respect
-  - [ ] Private repo support via PAT
-- [ ] Card renderers (`internal/card`)
-  - [ ] Profile details
-  - [ ] Top languages (by bytes + by commit)
-  - [ ] Stats (stars, commits, PRs, issues, contributed-to)
-  - [ ] Productive time heatmap
-- [ ] Themes (`internal/theme`) — pull the full set from github-readme-stats
-- [ ] GitHub Action wrapper for use in profile READMEs
-- [ ] Tests + examples
+The default `${{ github.token }}` can read public user data but will not see
+your private-repo commits. For accurate stats, create a **classic** personal
+access token with `read:user` and `repo`, save it as a repo secret (e.g.
+`GHSTATS_TOKEN`), and pass it via the `token` input.
 
 ## Credits & inspiration
 
-Standing on the shoulders of these projects:
-
-- [**github-profile-summary-cards**](https://github.com/vn7n24fzkq/github-profile-summary-cards) by [@vn7n24fzkq](https://github.com/vn7n24fzkq) — the card layout, theme set, and output structure are directly inspired by this tool.
-- [**profile-summary-for-github**](https://github.com/tipsy/profile-summary-for-github) by [@tipsy](https://github.com/tipsy) — the original web-based profile-summary generator; inspired the breakdowns (repos by language, most-commit language, etc.).
+- [**github-profile-summary-cards**](https://github.com/vn7n24fzkq/github-profile-summary-cards) by [@vn7n24fzkq](https://github.com/vn7n24fzkq) — card layout, theme set, and output structure.
+- [**profile-summary-for-github**](https://github.com/tipsy/profile-summary-for-github) by [@tipsy](https://github.com/tipsy) — the original profile-summary generator.
+- [**github-readme-stats**](https://github.com/anuraghazra/github-readme-stats) by [@anuraghazra](https://github.com/anuraghazra) — theme palette reference.
 
 ## License
 
