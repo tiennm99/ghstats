@@ -1,5 +1,5 @@
-name: ghstats
-description: Generate GitHub profile summary SVG cards (profile, languages, stats, productive time)
+name: ghstats-cards
+description: Generate GitHub profile summary SVG cards (profile, languages, stats, productive time, contributions)
 author: tiennm99
 branding:
   icon: bar-chart-2
