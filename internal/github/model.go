@@ -27,7 +27,7 @@ type Profile struct {
 	TotalIssues         int
 	TotalReviews        int
 	TotalContributedTo  int
-	TotalContributions  int // lifetime contributions from calendar + restricted
+	TotalContributionsLastYear int // contributionCalendar.totalContributions + restrictedContributionsCount (last year)
 
 	// Count of owned repos grouped by primary language, sorted desc by Value.
 	ReposByLanguage []LangStat
