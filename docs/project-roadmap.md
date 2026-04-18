@@ -26,7 +26,7 @@
 ## Phase 4 — Accurate repo sampling (✅ done)
 
 - Seed list built from `commitContributionsByRepository` across every active year.
-- `-include-forks` / `-include-private` visibility flags (default off).
+- `-include-forks` / `-include-private` visibility flags (defaults later flipped on in Phase 7).
 - `-top-repos` demoted to an optional cap (default 0 = unlimited).
 - Commit-history query takes `$owner` so forks and non-owned repos are probeable.
 
@@ -50,9 +50,21 @@ Follow-up after the full-project review (`plans/reports/code-review-260418-2223-
 - Stats card label "Contributed to (non-fork)" corrected to "Contributed to" (the query doesn't filter forks).
 - Tests: fixed stale XML-escape assertion, added `TestDonutSingleSlice`, added `TestUTCOffsetLabel` for half-hour zones.
 
+## Phase 7 — Release polish & Marketplace publish (✅ done)
+
+- Visibility defaults flipped on: `-include-forks`, `-include-private` now default `true` (private silently no-ops if token lacks scope).
+- Output filenames dropped the numeric prefix: `0-profile-details.svg` → `profile-details.svg` etc. Embedders reference by name.
+- Card dimensions shrunk `500×220` → `340×200` to match github-profile-summary-cards so two cards fit per row in a README.
+- Action `action.yml` name set to `ghstats-cards` for Marketplace (the bare `ghstats` is taken); repo stays `tiennm99/ghstats`.
+- `v1.0.0`, `v1.1.0`, `v1.1.1` tagged and released. Prebuilt binaries (linux/darwin/windows × amd64/arm64) ship with each; Docker image pushed to `ghcr.io/tiennm99/ghstats`.
+- Floating `v1` major tag created; `release.yml` has an `update-major-tag` job that force-moves `v1` to the latest patch after test+docker+binaries pass, so consumers pinned to `tiennm99/ghstats@v1` auto-pick new releases.
+- README badges (Marketplace / Release / License) + direct Marketplace link for cross-navigation.
+- Repo topics expanded for Marketplace discoverability (`ghstats-cards`, `profile-readme`, `stats-cards`, etc.).
+- An attempted repo rename to `tiennm99/ghstats-cards` was committed and reverted (commits `399a3dc` + `8bd2128` on record) — GHCR path immutability and the cost of breaking pinned consumers outweighed the Marketplace-name cosmetic benefit.
+
 ---
 
-## Phase 7 — Per-commit file classification (planned)
+## Phase 8 — Per-commit file classification (planned)
 
 **Goal**: fix the Markdown-blog misattribution case (and any repo where linguist's byte view disagrees with what files user actually edited).
 
@@ -64,7 +76,7 @@ Follow-up after the full-project review (`plans/reports/code-review-260418-2223-
 
 **Status**: designed, not implemented.
 
-## Phase 8 — Partial bare clone for lifetime all-repo stats (planned)
+## Phase 9 — Partial bare clone for lifetime all-repo stats (planned)
 
 **Goal**: lifetime language stats across **every** repo a user has committed in, without the 500-commits-per-repo cap.
 
@@ -76,7 +88,7 @@ Follow-up after the full-project review (`plans/reports/code-review-260418-2223-
 
 **Status**: researched only; behind `-deep` flag when landed.
 
-## Phase 9 — User-configurable repo exclusion (planned)
+## Phase 10 — User-configurable repo exclusion (planned)
 
 **Goal**: let users drop throwaway repos (experiments, forks they stashed) from stats without disabling forks globally.
 
@@ -86,7 +98,7 @@ Follow-up after the full-project review (`plans/reports/code-review-260418-2223-
 
 **Status**: pending user demand.
 
-## Phase 10 — Expand ownerAffiliations (planned)
+## Phase 11 — Expand ownerAffiliations (planned)
 
 **Goal**: catch work done in org repos where user is a collaborator, not owner (e.g., company monorepos).
 
@@ -104,7 +116,7 @@ Follow-up after the full-project review (`plans/reports/code-review-260418-2223-
 | No real-time API | Scope: scheduled batch renderer, not a server |
 | No WakaTime integration | Out of scope — WakaTime cards already exist (athul/waka-readme, anmol098/waka-readme-stats) |
 | No heatmap (7×24) variant of productive time | Simplified to 24-hour bar chart to match reference project |
-| Hard width of 500 px per card | Keeps README layout predictable; customizing width would cascade through every chart math |
+| Hard width of 340 px per card | Matches github-profile-summary-cards; customising would cascade through every chart's geometry. |
 
 ## Tracked research reports
 
