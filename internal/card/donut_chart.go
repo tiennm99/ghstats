@@ -57,25 +57,36 @@ func renderDonutCard(title string, stats []github.LangStat, t theme.Theme) []byt
 			escapeXML(s.Name), pct)
 	}
 
-	// Donut slices.
-	start := -math.Pi / 2 // 12 o'clock start
-	for _, s := range stats {
-		angle := 2 * math.Pi * float64(s.Value) / float64(total)
-		end := start + angle
-		large := 0
-		if angle > math.Pi {
-			large = 1
-		}
-		sx, sy := polar(cx, cy, outerR, start)
-		ex, ey := polar(cx, cy, outerR, end)
-		isx, isy := polar(cx, cy, innerR, end)
-		iex, iey := polar(cx, cy, innerR, start)
+	// Donut slices. Single-slice case renders as concentric circles because
+	// an SVG arc from P back to P draws nothing — a full ring needs a
+	// different primitive.
+	if len(stats) == 1 {
+		s := stats[0]
 		fmt.Fprintf(&b, `
+  <circle cx="%d" cy="%d" r="%.2f" fill="%s" stroke="%s" stroke-width="1.5"/>
+  <circle cx="%d" cy="%d" r="%.2f" fill="%s"/>`,
+			cx, cy, outerR, colorOrAccent(s.Color, t.Accent), t.Background,
+			cx, cy, innerR, t.Background)
+	} else {
+		start := -math.Pi / 2 // 12 o'clock start
+		for _, s := range stats {
+			angle := 2 * math.Pi * float64(s.Value) / float64(total)
+			end := start + angle
+			large := 0
+			if angle > math.Pi {
+				large = 1
+			}
+			sx, sy := polar(cx, cy, outerR, start)
+			ex, ey := polar(cx, cy, outerR, end)
+			isx, isy := polar(cx, cy, innerR, end)
+			iex, iey := polar(cx, cy, innerR, start)
+			fmt.Fprintf(&b, `
   <path d="M%.2f,%.2f A%.2f,%.2f 0 %d 1 %.2f,%.2f L%.2f,%.2f A%.2f,%.2f 0 %d 0 %.2f,%.2f Z" fill="%s" stroke="%s" stroke-width="1.5"/>`,
-			sx, sy, outerR, outerR, large, ex, ey,
-			isx, isy, innerR, innerR, large, iex, iey,
-			colorOrAccent(s.Color, t.Accent), t.Background)
-		start = end
+				sx, sy, outerR, outerR, large, ex, ey,
+				isx, isy, innerR, innerR, large, iex, iey,
+				colorOrAccent(s.Color, t.Accent), t.Background)
+			start = end
+		}
 	}
 
 	b.WriteString(footer)

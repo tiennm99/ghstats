@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"time"
 )
 
@@ -39,7 +40,7 @@ const scaleFactor = 10_000
 // One pagination pass populates both, so the all-time cards come at no extra
 // API cost beyond the pages already required for the last-year bucket.
 // loc is applied to CommittedDate so the heatmap reflects the user's tz.
-func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Location, maxPerRepo int) error {
+func (c *Client) FetchProductive(ctx context.Context, p *Profile, repos []RepoInfo, loc *time.Location, maxPerRepo int) error {
 	if loc == nil {
 		loc = time.UTC
 	}
@@ -50,6 +51,14 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 	langColor := map[string]string{}
 
 	for _, repo := range repos {
+		// Precompute the repo's total language bytes once; attributeCommit
+		// reuses it for every commit instead of re-summing ~10 edges per
+		// call in the inner loop.
+		var repoTotal int64
+		for _, l := range repo.Languages {
+			repoTotal += l.Bytes
+		}
+
 		var cursor *string
 		seen := 0
 		for {
@@ -70,7 +79,7 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 			}
 
 			var resp productiveGQL
-			if err := c.query(commitHistoryQuery, vars, &resp); err != nil {
+			if err := c.query(ctx, commitHistoryQuery, vars, &resp); err != nil {
 				return err
 			}
 			if resp.Repository == nil || resp.Repository.DefaultBranchRef == nil ||
@@ -85,10 +94,10 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 				}
 				tl := t.In(loc)
 				p.ProductiveAllTime[tl.Hour()]++
-				attributeCommit(repo, allTimeLang, langColor)
+				attributeCommit(repo, repoTotal, allTimeLang, langColor)
 				if tl.After(yearAgo) {
 					p.Productive[tl.Hour()]++
-					attributeCommit(repo, lastYearLang, langColor)
+					attributeCommit(repo, repoTotal, lastYearLang, langColor)
 				}
 				seen++
 			}
@@ -106,14 +115,12 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 }
 
 // attributeCommit distributes a single commit across the repo's languages
-// proportional to byte share. Falls back to the primary language when no
-// byte breakdown is available (empty repo or linguist-free repo).
-func attributeCommit(repo RepoInfo, commitsByLang map[string]int64, langColor map[string]string) {
-	var total int64
-	for _, l := range repo.Languages {
-		total += l.Bytes
-	}
-	if total == 0 {
+// proportional to byte share. Callers pass in the precomputed per-repo byte
+// total so this hot-path loop doesn't re-sum language edges every commit.
+// Falls back to the primary language when no byte breakdown is available
+// (empty repo or linguist-free repo).
+func attributeCommit(repo RepoInfo, repoTotal int64, commitsByLang map[string]int64, langColor map[string]string) {
+	if repoTotal == 0 {
 		if repo.PrimaryLanguage != "" {
 			commitsByLang[repo.PrimaryLanguage] += scaleFactor
 			if _, ok := langColor[repo.PrimaryLanguage]; !ok {
@@ -123,7 +130,7 @@ func attributeCommit(repo RepoInfo, commitsByLang map[string]int64, langColor ma
 		return
 	}
 	for _, l := range repo.Languages {
-		share := int64(scaleFactor) * l.Bytes / total
+		share := int64(scaleFactor) * l.Bytes / repoTotal
 		if share == 0 {
 			continue
 		}
