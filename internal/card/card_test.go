@@ -11,10 +11,13 @@ import (
 )
 
 func TestRenderAll(t *testing.T) {
+	// Name is rendered in every card's title via cardTitle(). Putting
+	// XML-significant chars here exercises escapeXML through the real
+	// rendering pipeline, not just through the unit test below.
 	p := &github.Profile{
 		Login:       "tiennm99",
-		Name:        "Minh Tien",
-		Bio:         "Test & <bio>",
+		Name:        `Alice & <bob> "quoted"`,
+		Company:     "VNG & <Corp>",
 		Followers:   12,
 		Following:   7,
 		PublicRepos: 42,
@@ -57,12 +60,43 @@ func TestRenderAll(t *testing.T) {
 		if err != nil {
 			t.Fatalf("read %s: %v", name, err)
 		}
-		if !strings.HasPrefix(string(data), "<svg") {
+		content := string(data)
+		if !strings.HasPrefix(content, "<svg") {
 			t.Errorf("%s: missing <svg prefix", name)
 		}
-		if strings.Contains(string(data), "Test & <bio>") {
-			t.Errorf("%s: raw XML special characters leaked through escape", name)
+		// The raw Name string contains `&`, `<`, `>`, `"`. None should
+		// appear unescaped in the final markup. Presence of the escaped
+		// forms also verifies the title actually got rendered.
+		for _, leak := range []string{`Alice & <bob>`, `VNG & <Corp>`, `"quoted"`} {
+			if strings.Contains(content, leak) {
+				t.Errorf("%s: raw XML special characters leaked through escape (%q)", name, leak)
+			}
 		}
+	}
+}
+
+// TestDonutSingleSlice verifies the donut renderer handles a single-slice
+// case (100%) with visible geometry. Regression guard against the empty-arc
+// bug where start == end degenerates the SVG A command.
+func TestDonutSingleSlice(t *testing.T) {
+	th, _ := theme.Lookup("dracula")
+	stats := []github.LangStat{{Name: "Go", Color: "#00ADD8", Value: 100}}
+	svg := string(renderDonutCard("Test", stats, th))
+
+	if !strings.Contains(svg, "<circle") {
+		t.Errorf("single-slice donut should use <circle> primitives; got:\n%s", svg)
+	}
+	if strings.Contains(svg, `A70.00,70.00 0 1 1 380.00,50.00`) {
+		t.Error("single-slice donut still emits degenerate arc")
+	}
+}
+
+// TestDonutEmpty verifies the zero-stats fallback path.
+func TestDonutEmpty(t *testing.T) {
+	th, _ := theme.Lookup("dracula")
+	svg := string(renderDonutCard("Test", nil, th))
+	if !strings.Contains(svg, "No data available") {
+		t.Errorf("empty donut should render the no-data fallback; got:\n%s", svg)
 	}
 }
 
