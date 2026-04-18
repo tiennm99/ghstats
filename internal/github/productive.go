@@ -23,11 +23,25 @@ type productiveGQL struct {
 	} `json:"repository"`
 }
 
+// scaleFactor is the fixed-point multiplier used when distributing a single
+// commit across several languages by byte share. Stored in LangStat.Value
+// (int64) so the existing sort + percentage math keeps working; the absolute
+// magnitude is irrelevant because the card renders percentages.
+const scaleFactor = 10_000
+
 // FetchProductive fills p.Productive with a 24-hour commit histogram over the
-// last year and p.CommitsByLanguage with commit counts attributed to each
-// repo's primary language. Commits are gathered from the given repos (usually
-// p.TopRepos[:N]); each repo is sampled up to maxPerRepo commits to keep the
-// cost bounded.
+// last year and p.CommitsByLanguage with commit counts distributed across each
+// repo's language byte breakdown. Commits are gathered from the given repos
+// (usually p.TopRepos[:N]); each repo is sampled up to maxPerRepo commits to
+// keep the cost bounded.
+//
+// Attribution model: each commit contributes a whole scaleFactor unit,
+// partitioned across the repo's languages proportional to linguist byte
+// counts. A repo that is 60% Go / 40% Python credits 0.6 to Go and 0.4 to
+// Python per commit — a strict upgrade over the previous primary-language-
+// only model. Prose languages (Markdown, AsciiDoc, …) remain excluded by
+// linguist itself, so blog-style repos still skew toward their detected
+// code fraction; fixing that requires per-commit file classification.
 //
 // The timezone loc is applied to CommittedDate so the heatmap reflects when
 // the user actually commits, not UTC.
@@ -72,12 +86,7 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 					continue
 				}
 				p.Productive[t.In(loc).Hour()]++
-				if repo.PrimaryLanguage != "" {
-					commitsByLang[repo.PrimaryLanguage]++
-					if _, ok := langColor[repo.PrimaryLanguage]; !ok {
-						langColor[repo.PrimaryLanguage] = repo.PrimaryColor
-					}
-				}
+				attributeCommit(repo, commitsByLang, langColor)
 				seen++
 			}
 			if !h.PageInfo.HasNextPage {
@@ -90,4 +99,33 @@ func (c *Client) FetchProductive(p *Profile, repos []RepoInfo, loc *time.Locatio
 
 	p.CommitsByLanguage = sortLangStats(commitsByLang, langColor)
 	return nil
+}
+
+// attributeCommit distributes a single commit across the repo's languages
+// proportional to byte share. Falls back to the primary language when no
+// byte breakdown is available (empty repo or linguist-free repo).
+func attributeCommit(repo RepoInfo, commitsByLang map[string]int64, langColor map[string]string) {
+	var total int64
+	for _, l := range repo.Languages {
+		total += l.Bytes
+	}
+	if total == 0 {
+		if repo.PrimaryLanguage != "" {
+			commitsByLang[repo.PrimaryLanguage] += scaleFactor
+			if _, ok := langColor[repo.PrimaryLanguage]; !ok {
+				langColor[repo.PrimaryLanguage] = repo.PrimaryColor
+			}
+		}
+		return
+	}
+	for _, l := range repo.Languages {
+		share := int64(scaleFactor) * l.Bytes / total
+		if share == 0 {
+			continue
+		}
+		commitsByLang[l.Name] += share
+		if _, ok := langColor[l.Name]; !ok {
+			langColor[l.Name] = l.Color
+		}
+	}
 }

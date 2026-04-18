@@ -116,16 +116,20 @@ func (c *Client) FetchProfile(login string) (*Profile, error) {
 					langColor[r.PrimaryLanguage.Name] = r.PrimaryLanguage.Color
 				}
 			}
-			p.TopRepos = append(p.TopRepos, info)
-
-			// Capture secondary language colors so productive-time's
-			// per-language aggregation can color them even if that language
-			// isn't the primary of any other repo.
+			// Carry the repo's full language-bytes breakdown so commit
+			// attribution can distribute each commit across all languages
+			// the repo contains, not just the primary.
 			for _, e := range r.Languages.Edges {
+				info.Languages = append(info.Languages, LangEdge{
+					Name:  e.Node.Name,
+					Color: e.Node.Color,
+					Bytes: e.Size,
+				})
 				if _, ok := langColor[e.Node.Name]; !ok {
 					langColor[e.Node.Name] = e.Node.Color
 				}
 			}
+			p.TopRepos = append(p.TopRepos, info)
 		}
 
 		if !u.Repositories.PageInfo.HasNextPage {
