@@ -1,6 +1,9 @@
 package github
 
 import (
+	"context"
+	"fmt"
+	"os"
 	"sort"
 	"time"
 )
@@ -37,7 +40,7 @@ type contributionYearGQL struct {
 //
 // Fork and private repos are filtered client-side per opts so the caller can
 // run the same pipeline with different visibility policies.
-func (c *Client) FetchContributionsAllTime(p *Profile, opts FetchOptions) error {
+func (c *Client) FetchContributionsAllTime(ctx context.Context, p *Profile, opts FetchOptions) error {
 	years := append([]int(nil), p.ContributionYears...)
 	sort.Ints(years) // ascending so the concatenated series is oldest→newest
 
@@ -56,10 +59,14 @@ func (c *Client) FetchContributionsAllTime(p *Profile, opts FetchOptions) error 
 			"to":    to.Format(time.RFC3339),
 		}
 		var resp contributionYearGQL
-		if err := c.query(contributionYearQuery, vars, &resp); err != nil {
+		if err := c.query(ctx, contributionYearQuery, vars, &resp); err != nil {
 			return err
 		}
 		if resp.User == nil {
+			// Don't abort the run — other years may still yield data — but
+			// make the partial-data case visible instead of rendering an
+			// empty all-time card silently.
+			fmt.Fprintf(os.Stderr, "warn: contribution year %d returned no user data\n", y)
 			continue
 		}
 
