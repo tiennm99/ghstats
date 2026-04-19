@@ -15,13 +15,13 @@ ghstats/
 │   │   ├── queries.go                   # profileQuery, commitHistoryQuery, contributionYearQuery
 │   │   ├── model.go                     # Profile, RepoInfo, LangStat, LangEdge, DailyContribution
 │   │   ├── profile.go                   # FetchProfile — user + owned repos + stats + calendar
-│   │   ├── productive.go                # FetchProductive — commit history → hour histogram + lang buckets
+│   │   ├── productive.go                # FetchProductive — commit history → hour + weekday histograms + lang buckets
 │   │   ├── contributions_all_time.go    # FetchContributionsAllTime — per-year loop → seed list + daily series
 │   │   └── profile_test.go              # sortLangStats tiebreak
 │   ├── card/                            # SVG renderers; one file per card
 │   │   ├── card.go                      # Card interface, RenderAll, allCards slice
-│   │   ├── svg.go                       # escapeXML, formatInt, header, footer
-│   │   ├── axis.go                      # niceTicks (d3-style 1/2/5 × 10^k), formatTick
+│   │   ├── svg.go                       # escapeXML, formatInt, truncate, header (auto-fit title), footer
+│   │   ├── axis.go                      # niceTicks (d3-style, last tick ≥ max), formatTick (1500→"1.5k")
 │   │   ├── icons.go                     # Octicon path strings
 │   │   ├── profile.go                   # profile-details
 │   │   ├── repos_per_language.go        # repos-per-language
@@ -45,8 +45,10 @@ ghstats/
 │   └── demo.yml                         # Renders every theme for the repo owner on push to main
 ├── docs/                                # This directory
 ├── plans/                               # Research reports + implementation plans
-└── demo/                                # Auto-generated gallery — every card × every theme + README
-                                         # (`output/` is entirely gitignored; see demo/ for reference renders)
+└── demo/                                # Auto-generated gallery
+    ├── README.md                         # Lightweight index (links only, zero images)
+    └── <theme>/                          # Per-theme page: 15 SVGs + README pairing LY / AT variants
+                                          # (`output/` is entirely gitignored; see demo/ for reference renders)
 ```
 
 ## Module responsibilities
@@ -99,7 +101,7 @@ contributionYearQuery ─┬──► SeedRepos + DailyContributionsAllTime + To
                        │
                        └─ seed into ─►
                                 │
-commitHistoryQuery ──► Productive + CommitsByLanguage (+ AllTime variants)
+commitHistoryQuery ──► Productive + Weekday + CommitsByLanguage (+ AllTime variants)
                                 │
                                 ▼
                           15 SVG files per theme
@@ -107,7 +109,7 @@ commitHistoryQuery ──► Productive + CommitsByLanguage (+ AllTime variants)
 
 ## Test coverage
 
-- `internal/card/card_test.go` — `RenderAll` produces 15 valid SVGs; XML escape through real render pipeline; `formatInt` cases; `TestDonutSingleSlice` (guards the empty-arc regression); `TestDonutEmpty` (no-data fallback).
+- `internal/card/card_test.go` — `RenderAll` produces 15 valid SVGs; XML escape through real render pipeline; `formatInt` cases; `TestDonutSingleSlice` / `TestDonutEmpty` (donut edge cases); `TestCardsFitFrame` (renders every card against an adversarial profile and asserts text + coordinates stay in the 340×200 frame); `TestFitTitleFontSize` (pins the auto-shrink table for every real title); `TestNiceTicksCoversMax` (guards the `yMax ≥ dataMax` invariant so bars can't overflow chartH).
 - `internal/github/profile_test.go` — `sortLangStats` ordering and tiebreak.
 - `main_test.go` — `TestUTCOffsetLabel` covers UTC, Asia/Saigon, half-hour (Kolkata), quarter-hour (Kathmandu) zones.
 

@@ -57,8 +57,10 @@ Never write comments that describe what well-named code does (`// increment coun
 ## SVG output standards
 
 - Always XML-escape user-controlled strings through `escapeXML` (`&`, `<`, `>`, `"`, `'`).
-- Numbers formatted via `formatInt` with thousands separators.
+- Long user-controlled strings (bio, names, company, repo slugs) go through `truncate` in `svg.go` before rendering — never print raw multi-line input that could push a later element off-screen.
+- Body numbers formatted via `formatInt` (thousands separators). Y-axis tick numbers go through `formatTick`, which abbreviates ≥ 1000 to `k` / `M` / `B` so no label exceeds 4 chars.
 - Stable viewbox per card (`340×200`) matching github-profile-summary-cards.
+- Titles render through `header()` which auto-shrinks font-size (15 → 11 px) when the string wouldn't fit in `width − 20 − 4`.
 - No `<script>` tags, no event handlers. Cards are pure markup.
 
 ## Testing

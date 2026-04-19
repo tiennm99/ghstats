@@ -77,7 +77,7 @@ Card count: 9 → 15 (weekday adds LY + AT variants). `FetchProductive` still pa
 ## Phase 7.5 — Demo gallery for theme discovery (✅ done)
 
 - New `.github/workflows/demo.yml` renders every card for every theme against the repo owner's profile on each push to `main`.
-- Output lands in `demo/<theme>/`, with an auto-generated `demo/README.md` TOC so reviewers can browse palettes side-by-side with real data instead of cloning and running the CLI.
+- Output lands in `demo/<theme>/` (SVGs + a `README.md` for that theme pairing last-year / all-time variants side-by-side); top-level `demo/README.md` is a zero-image index linking to each theme page, so opening the gallery doesn't force a reader to fetch 975 SVGs at once.
 - Loop prevention: workflow skips pushes that only touch `demo/**`, `**.md`, or `LICENSE`; `GITHUB_TOKEN`-driven pushes don't retrigger workflows by design.
 - Consumer impact: none — this is a repo-internal discovery aid, not a shipped feature.
 
