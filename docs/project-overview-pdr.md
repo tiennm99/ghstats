@@ -60,9 +60,6 @@ Distinguishing traits:
 - Test suite covers rendering, XML escaping, number formatting, language sort.
 - `go vet ./...` and `go test ./...` clean on every commit.
 
-## Open questions / tracked roadmap items
+## Open questions
 
-- Per-commit REST classification (`-accurate-languages`)
-- Partial bare clone mode for lifetime all-repo language stats
-- `-exclude-repo` flag to drop known noise repos
-- Expose `ownerAffiliations` beyond OWNER (COLLABORATOR, ORGANIZATION_MEMBER)
+Planned follow-on work lives in [`project-roadmap.md`](./project-roadmap.md).
