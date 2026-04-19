@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="340" height="200" viewBox="0 0 340 200" font-family="'Segoe UI', Ubuntu, Sans-Serif">
   <rect x="0.5" y="0.5" width="339" height="199" rx="6" fill="#291b3e" stroke="#000000" stroke-opacity="0.00"/>
-  <text x="20" y="30" font-size="14" font-weight="600" fill="#ff64da">Commits by Hour (last year, UTC+7.00)</text>
+  <text x="20" y="30" font-size="15" font-weight="600" fill="#ff64da">Commits by Hour (last year, UTC+7)</text>
   <line x1="35" y1="45" x2="35" y2="155" stroke="#a960ff"/>
   <line x1="31" y1="155" x2="35" y2="155" stroke="#a960ff"/>
   <text x="29" y="158" font-size="10" fill="#a960ff" text-anchor="end">0</text>
@@ -36,7 +36,7 @@
   <rect x="132.00" y="139.16" width="11.12" height="15.84" rx="2" fill="#ff64da"><title>08:00 — 36 commits</title></rect>
   <rect x="144.12" y="108.36" width="11.12" height="46.64" rx="2" fill="#ff64da"><title>09:00 — 106 commits</title></rect>
   <rect x="156.25" y="97.80" width="11.12" height="57.20" rx="2" fill="#ff64da"><title>10:00 — 130 commits</title></rect>
-  <rect x="168.38" y="112.76" width="11.12" height="42.24" rx="2" fill="#ff64da"><title>11:00 — 96 commits</title></rect>
+  <rect x="168.38" y="112.32" width="11.12" height="42.68" rx="2" fill="#ff64da"><title>11:00 — 97 commits</title></rect>
   <rect x="180.50" y="131.24" width="11.12" height="23.76" rx="2" fill="#ff64da"><title>12:00 — 54 commits</title></rect>
   <rect x="192.62" y="123.76" width="11.12" height="31.24" rx="2" fill="#ff64da"><title>13:00 — 71 commits</title></rect>
   <rect x="204.75" y="128.60" width="11.12" height="26.40" rx="2" fill="#ff64da"><title>14:00 — 60 commits</title></rect>

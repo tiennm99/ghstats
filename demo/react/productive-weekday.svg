@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="340" height="200" viewBox="0 0 340 200" font-family="'Segoe UI', Ubuntu, Sans-Serif">
   <rect x="0.5" y="0.5" width="339" height="199" rx="6" fill="#20232a" stroke="#000000" stroke-opacity="0.00"/>
-  <text x="20" y="30" font-size="13" font-weight="600" fill="#61dafb">Commits by Weekday (last year, UTC+7.00)</text>
+  <text x="20" y="30" font-size="15" font-weight="600" fill="#61dafb">Commits by Weekday (last year)</text>
   <line x1="35" y1="45" x2="35" y2="155" stroke="#61dafb"/>
   <line x1="31" y1="155" x2="35" y2="155" stroke="#61dafb"/>
   <text x="29" y="158" font-size="10" fill="#61dafb" text-anchor="end">0</text>
@@ -13,7 +13,7 @@
   <line x1="31" y1="45" x2="35" y2="45" stroke="#61dafb"/>
   <text x="29" y="48" font-size="10" fill="#61dafb" text-anchor="end">400</text>
   <line x1="35" y1="155" x2="325" y2="155" stroke="#61dafb"/>
-  <rect x="35.00" y="85.15" width="36.29" height="69.85" rx="2" fill="#43879c"><title>Sun — 254 commits</title></rect>
+  <rect x="35.00" y="84.88" width="36.29" height="70.12" rx="2" fill="#43879c"><title>Sun — 255 commits</title></rect>
   <text x="53.14" y="169" font-size="10" fill="#61dafb" text-anchor="middle">Sun</text>
   <rect x="77.29" y="104.40" width="36.29" height="50.60" rx="2" fill="#43879c"><title>Mon — 184 commits</title></rect>
   <text x="95.43" y="169" font-size="10" fill="#61dafb" text-anchor="middle">Mon</text>
