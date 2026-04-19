@@ -97,9 +97,16 @@ Each card produces a self-contained SVG with:
 - Content layer (chart elements, text, legend)
 
 Shared primitives:
-- `renderDonutCard(title, stats, theme)` — pie slices via polar arc math + legend with color swatches. Single-slice case (one language at 100%) renders as two concentric `<circle>` elements instead of an arc, since SVG's `A` command from point P back to P draws nothing.
+- `renderDonutCard(title, stats, theme)` — pie slices via polar arc math + legend with color swatches (top 7 entries, rest collapse into "Other"). Single-slice case (one language at 100%) renders as two concentric `<circle>` elements instead of an arc, since SVG's `A` command from point P back to P draws nothing.
 - `renderProductiveTime(title, hours, theme)` — 24 bars + both axes + tick math from `niceTicks`
+- `renderWeekday(title, data, theme)` — 7-bar day-of-week chart mirroring the productive-time layout; peak bar uses `theme.Accent`, others `mixHex(Background, Accent, 0.55)`
+- `renderHeatmap(title, days, theme)` — 7×53 calendar grid with a 5-bucket intensity ramp synthesised from `theme.Background → theme.Accent`
 - `renderContributions(title, days, theme)` — monthly aggregation, Catmull-Rom → cubic Bezier area path, two-sided Y axis
+
+Chart-geometry invariants:
+- `niceTicks(max, 5)` rounds the top tick up to the next step (`last = ceil(max/step) × step`), guaranteeing `yMax ≥ dataMax` — bar heights can never exceed `chartH` and collide with the title row.
+- `formatTick` abbreviates ≥ 1000 to `k` / `M` / `B` so y-axis labels never exceed 4 characters (`10000 → "10k"`, `1234567 → "1.2M"`); keeps the left gutter ≤ 28 px for every profile.
+- `header()` picks the largest title font in [11, 15] px at which the string fits in `width − 24` at a 0.6 char-width estimate, so long titles like `Commits by Weekday (last year, UTC+7.00)` still fit the frame.
 
 Catmull-Rom control-point math: for each segment `P_i → P_{i+1}`,
 ```
