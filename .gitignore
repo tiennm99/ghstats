@@ -27,10 +27,9 @@ go.work.sum
 # env file
 .env
 
-# Generated SVG cards from local runs — keep the dracula sample tracked so the
-# README's embedded previews resolve; other themes are rebuilt on demand.
-output/*
-!output/dracula/
+# Generated SVG cards from local runs. Use the demo/ gallery (auto-generated
+# in CI) as the reference render instead of committing a sample here.
+output/
 
 # Editor/IDE
 # .idea/
