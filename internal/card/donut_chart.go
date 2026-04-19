@@ -99,19 +99,23 @@ func polar(cx, cy float64, r, angle float64) (float64, float64) {
 	return cx + r*math.Cos(angle), cy + r*math.Sin(angle)
 }
 
-// collapseOther returns the top (n-1) slices plus an "Other" row summing the
-// rest. When the slice fits, it's returned as-is.
+// collapseOther returns the top n named entries, optionally followed by an
+// "Other" row summing everything past that. "Top N" means N actual languages
+// — the Other row is a bonus when there's a non-zero tail, not one of the N.
+// When the input fits in N entries the caller gets the slice back as-is.
 func collapseOther(in []github.LangStat, n int) []github.LangStat {
 	if len(in) <= n {
 		return in
 	}
-	out := make([]github.LangStat, 0, n)
-	out = append(out, in[:n-1]...)
+	out := make([]github.LangStat, 0, n+1)
+	out = append(out, in[:n]...)
 	var rest int64
-	for _, s := range in[n-1:] {
+	for _, s := range in[n:] {
 		rest += s.Value
 	}
-	out = append(out, github.LangStat{Name: "Other", Value: rest})
+	if rest > 0 {
+		out = append(out, github.LangStat{Name: "Other", Value: rest})
+	}
 	return out
 }
 

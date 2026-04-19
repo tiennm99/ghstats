@@ -141,6 +141,37 @@ func TestDonutEmpty(t *testing.T) {
 	}
 }
 
+// TestDonutTopSevenPlusOther confirms the "7 named + Other" contract: when
+// the input has more than 7 languages, the legend shows all 7 real entries
+// followed by a single "Other" bucket. Regression guard against anyone
+// sliding topN back to "N-1 real + Other" packing.
+func TestDonutTopSevenPlusOther(t *testing.T) {
+	th, _ := theme.Lookup("dracula")
+	stats := []github.LangStat{
+		{Name: "Go", Color: "#00ADD8", Value: 100},
+		{Name: "TypeScript", Color: "#3178c6", Value: 90},
+		{Name: "Python", Color: "#3572A5", Value: 80},
+		{Name: "Rust", Color: "#dea584", Value: 70},
+		{Name: "JavaScript", Color: "#f1e05a", Value: 60},
+		{Name: "HTML", Color: "#e34c26", Value: 50},
+		{Name: "Shell", Color: "#89e051", Value: 40},
+		{Name: "Kotlin", Color: "#A97BFF", Value: 30},
+		{Name: "Java", Color: "#b07219", Value: 20},
+	}
+	svg := string(renderDonutCard("Test", stats, th))
+	for _, want := range []string{"Go", "TypeScript", "Python", "Rust", "JavaScript", "HTML", "Shell", "Other"} {
+		if !strings.Contains(svg, ">"+want+" ") {
+			t.Errorf("expected legend row for %q; not found in:\n%s", want, svg)
+		}
+	}
+	// Kotlin + Java spill into Other (they must NOT appear as named rows).
+	for _, dropped := range []string{">Kotlin ", ">Java "} {
+		if strings.Contains(svg, dropped) {
+			t.Errorf("expected %q to be collapsed into Other, but it renders:\n%s", dropped, svg)
+		}
+	}
+}
+
 func TestFormatInt(t *testing.T) {
 	cases := map[int]string{
 		0:       "0",
@@ -356,12 +387,19 @@ func adversarialProfile() *github.Profile {
 		TotalContributedTo:         777,
 		TotalContributionsLastYear: 200_000,
 		CreatedAt:                  time.Date(2008, 1, 1, 0, 0, 0, 0, time.UTC),
+		// Nine languages so the donut's "top 7 + Other" layout renders all
+		// eight legend rows — catches any regression that breaks the tall
+		// legend geometry at y≈195.
 		ReposByLanguage: []github.LangStat{
 			{Name: "JavaScript", Color: "#f1e05a", Value: 1234},
 			{Name: "TypeScript", Color: "#3178c6", Value: 999},
 			{Name: "Go", Color: "#00ADD8", Value: 500},
 			{Name: "Rust", Color: "#dea584", Value: 321},
 			{Name: "Python", Color: "#3572A5", Value: 200},
+			{Name: "HTML", Color: "#e34c26", Value: 180},
+			{Name: "Shell", Color: "#89e051", Value: 120},
+			{Name: "Kotlin", Color: "#A97BFF", Value: 60},
+			{Name: "Java", Color: "#b07219", Value: 30},
 		},
 		CommitsByLanguage: []github.LangStat{
 			{Name: "JavaScript", Color: "#f1e05a", Value: 1_000_000},
