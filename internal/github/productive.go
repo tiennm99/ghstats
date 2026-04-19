@@ -94,9 +94,11 @@ func (c *Client) FetchProductive(ctx context.Context, p *Profile, repos []RepoIn
 				}
 				tl := t.In(loc)
 				p.ProductiveAllTime[tl.Hour()]++
+				p.WeekdayAllTime[tl.Weekday()]++
 				attributeCommit(repo, repoTotal, allTimeLang, langColor)
 				if tl.After(yearAgo) {
 					p.Productive[tl.Hour()]++
+					p.Weekday[tl.Weekday()]++
 					attributeCommit(repo, repoTotal, lastYearLang, langColor)
 				}
 				seen++

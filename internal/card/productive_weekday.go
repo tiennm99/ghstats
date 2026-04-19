@@ -1,0 +1,111 @@
+package card
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/tiennm99/ghstats/internal/github"
+	"github.com/tiennm99/ghstats/internal/theme"
+)
+
+type productiveWeekdayCard struct{}
+
+func (productiveWeekdayCard) Filename() string { return "productive-weekday.svg" }
+
+func (productiveWeekdayCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
+	return renderWeekday(weekdayTitle("last year", p.UTCOffsetLabel), p.Weekday, t), nil
+}
+
+type productiveWeekdayAllTimeCard struct{}
+
+func (productiveWeekdayAllTimeCard) Filename() string { return "productive-weekday-all-time.svg" }
+
+func (productiveWeekdayAllTimeCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
+	return renderWeekday(weekdayTitle("all time", p.UTCOffsetLabel), p.WeekdayAllTime, t), nil
+}
+
+func weekdayTitle(window, utcLabel string) string {
+	if utcLabel == "" {
+		return "Commits by Weekday (" + window + ")"
+	}
+	return "Commits by Weekday (" + window + ", " + utcLabel + ")"
+}
+
+// Index 0 = Sunday to match time.Weekday (which is what FetchProductive stores).
+var weekdayLabels = [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+
+// renderWeekday draws a 7-bar chart: one bar per weekday. Reuses the same
+// axis math as the hour-of-day card so the two feel like a matched pair.
+func renderWeekday(title string, data [7]int, t theme.Theme) []byte {
+	const (
+		width    = 340
+		height   = 200
+		leftAxis = 35
+		rightPad = 15
+		topPad   = 45
+		chartH   = 110
+		barGap   = 6
+	)
+	chartW := width - leftAxis - rightPad
+	barW := float64(chartW-barGap*6) / 7.0
+
+	var b strings.Builder
+	b.WriteString(header(width, height, t.Background, t.Stroke, t.StrokeOpacity, t.Title, title))
+
+	max := 0
+	peak := 0
+	for i, v := range data {
+		if v > max {
+			max = v
+			peak = i
+		}
+	}
+	yMax := float64(max)
+	if yMax == 0 {
+		yMax = 1
+	}
+	ticks := niceTicks(yMax, 5)
+	if len(ticks) > 0 {
+		yMax = ticks[len(ticks)-1]
+	}
+
+	// Y axis + ticks.
+	fmt.Fprintf(&b, `
+  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="%s"/>`,
+		leftAxis, topPad, leftAxis, topPad+chartH, t.Muted)
+	for _, v := range ticks {
+		y := topPad + chartH - int(float64(chartH)*v/yMax)
+		fmt.Fprintf(&b, `
+  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="%s"/>
+  <text x="%d" y="%d" font-size="10" fill="%s" text-anchor="end">%s</text>`,
+			leftAxis-4, y, leftAxis, y, t.Muted,
+			leftAxis-6, y+3, t.Muted, escapeXML(formatTick(v)))
+	}
+
+	// X axis baseline + weekday labels.
+	fmt.Fprintf(&b, `
+  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="%s"/>`,
+		leftAxis, topPad+chartH, leftAxis+chartW, topPad+chartH, t.Muted)
+
+	// Bars. Peak weekday gets full Accent; others the dimmed variant so the
+	// busiest day reads at a glance.
+	dim := mixHex(t.Background, t.Accent, 0.55)
+	for i := 0; i < 7; i++ {
+		count := data[i]
+		barH := float64(chartH) * float64(count) / yMax
+		x := float64(leftAxis) + (barW+float64(barGap))*float64(i)
+		y := float64(topPad+chartH) - barH
+		fill := dim
+		if i == peak && max > 0 {
+			fill = t.Accent
+		}
+		fmt.Fprintf(&b, `
+  <rect x="%.2f" y="%.2f" width="%.2f" height="%.2f" rx="2" fill="%s"><title>%s — %d commits</title></rect>
+  <text x="%.2f" y="%d" font-size="10" fill="%s" text-anchor="middle">%s</text>`,
+			x, y, barW, barH, fill, weekdayLabels[i], count,
+			x+barW/2, topPad+chartH+14, t.Muted, weekdayLabels[i])
+	}
+
+	b.WriteString(footer)
+	return []byte(b.String())
+}
