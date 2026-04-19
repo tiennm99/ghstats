@@ -78,7 +78,7 @@ Card count: 9 → 14. `FetchProductive` still pays for commit-history pagination
 
 - New `.github/workflows/demo.yml` renders every card for every theme against the repo owner's profile on each push to `main`.
 - Output lands in `demo/<theme>/`, with an auto-generated `demo/README.md` TOC so reviewers can browse palettes side-by-side with real data instead of cloning and running the CLI.
-- Loop prevention: workflow skips pushes that only touch `demo/**`, `output/**`, `**.md`, or `LICENSE`; `GITHUB_TOKEN`-driven pushes don't retrigger workflows by design.
+- Loop prevention: workflow skips pushes that only touch `demo/**`, `**.md`, or `LICENSE`; `GITHUB_TOKEN`-driven pushes don't retrigger workflows by design.
 - Consumer impact: none — this is a repo-internal discovery aid, not a shipped feature.
 
 ---

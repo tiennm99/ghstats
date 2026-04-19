@@ -45,8 +45,8 @@ ghstats/
 │   └── demo.yml                         # Renders every theme for the repo owner on push to main
 ├── docs/                                # This directory
 ├── plans/                               # Research reports + implementation plans
-├── demo/                                # Auto-generated gallery — every card × every theme + README
-└── output/dracula/                      # Sample committed; other themes gitignored
+└── demo/                                # Auto-generated gallery — every card × every theme + README
+                                         # (`output/` is entirely gitignored; see demo/ for reference renders)
 ```
 
 ## Module responsibilities

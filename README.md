@@ -32,7 +32,7 @@ Cards rendered:
 | 13 | **Contributions (all time)** | Area chart across every active year, auto-thinned x-axis labels |
 | 14 | **Contributions by year** | One bar per active year, peak year highlighted |
 
-Live `dracula` sample ships in [`output/dracula/`](./output/dracula). Every available theme rendered against the author's profile — profile details, stats, language donuts, productive-time, contributions — is browsable in the auto-generated [**demo gallery**](./demo). Regenerated on every push to `main` by [`.github/workflows/demo.yml`](./.github/workflows/demo.yml).
+Every available theme rendered against the author's profile — profile details, stats, language donuts, productive-time, heatmap, streak, contributions, top repos — is browsable in the auto-generated [**demo gallery**](./demo). Regenerated on every push to `main` by [`.github/workflows/demo.yml`](./.github/workflows/demo.yml).
 
 ## In the wild
 
@@ -187,8 +187,9 @@ output/
     contributions-by-year.svg
 ```
 
-Only the `dracula` theme is tracked in git as a reference sample; other
-themes are rebuilt on each run and gitignored.
+`output/` is entirely gitignored — it's regenerated on each run. For a
+reference render of every card in every theme, see the CI-built
+[`demo/`](./demo) gallery instead.
 
 ## Tokens & permissions
 
