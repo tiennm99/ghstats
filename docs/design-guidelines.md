@@ -50,7 +50,7 @@ Cap rows at what fits: up to 7 rows per card. Stats splits commits into lifetime
 | Donut centre | `(250, 110)` |
 | Outer radius | 55 |
 | Inner radius | 30 |
-| Top-N entries shown | 7 (overflow collapses into "Other") |
+| Top-N entries shown | Up to 7 named languages, plus an "Other" row when the tail is non-zero (8 rows max) |
 | Slice stroke | `theme.Background`, 1.5 px (gap between slices) |
 | Legend origin | `(20, 55)` |
 | Legend row height | 20 px |
