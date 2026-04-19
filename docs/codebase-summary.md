@@ -29,7 +29,12 @@ ghstats/
 │   │   ├── most_commit_language_all_time.go  # most-commit-language-all-time
 │   │   ├── stats.go                     # stats
 │   │   ├── productive.go                # productive-time (+ all-time)
+│   │   ├── productive_weekday.go        # productive-weekday (+ all-time)
 │   │   ├── contributions.go             # contributions (+ all-time)
+│   │   ├── contributions_heatmap.go     # contributions-heatmap (7×53 calendar grid)
+│   │   ├── contributions_by_year.go     # contributions-by-year bar chart
+│   │   ├── streak.go                    # streak (current/longest/active days)
+│   │   ├── top_starred_repos.go         # top-starred-repos bar list
 │   │   ├── donut_chart.go               # renderDonutCard — shared by language cards
 │   │   └── card_test.go                 # Rendering + escape + format tests
 │   └── theme/
@@ -94,12 +99,12 @@ contributionYearQuery ─┬──► SeedRepos + DailyContributionsAllTime + To
 commitHistoryQuery ──► Productive + CommitsByLanguage (+ AllTime variants)
                                 │
                                 ▼
-                          9 SVG files per theme
+                          14 SVG files per theme
 ```
 
 ## Test coverage
 
-- `internal/card/card_test.go` — `RenderAll` produces 9 valid SVGs; XML escape through real render pipeline; `formatInt` cases; `TestDonutSingleSlice` (guards the empty-arc regression); `TestDonutEmpty` (no-data fallback).
+- `internal/card/card_test.go` — `RenderAll` produces 14 valid SVGs; XML escape through real render pipeline; `formatInt` cases; `TestDonutSingleSlice` (guards the empty-arc regression); `TestDonutEmpty` (no-data fallback).
 - `internal/github/profile_test.go` — `sortLangStats` ordering and tiebreak.
 - `main_test.go` — `TestUTCOffsetLabel` covers UTC, Asia/Saigon, half-hour (Kolkata), quarter-hour (Kathmandu) zones.
 

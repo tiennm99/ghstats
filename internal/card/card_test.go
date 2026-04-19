@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/tiennm99/ghstats/internal/github"
 	"github.com/tiennm99/ghstats/internal/theme"
@@ -31,9 +32,41 @@ func TestRenderAll(t *testing.T) {
 			{Name: "Go", Color: "#00ADD8", Value: 420},
 			{Name: "Python", Color: "#3572A5", Value: 150},
 		},
+		TopRepos: []github.RepoInfo{
+			{Owner: "tiennm99", Name: "ghstats", Stars: 42, PrimaryLanguage: "Go", PrimaryColor: "#00ADD8"},
+			{Owner: "tiennm99", Name: "some-app & <tool>", Stars: 17, PrimaryLanguage: "TypeScript", PrimaryColor: "#3178c6"},
+			{Owner: "tiennm99", Name: "fork-only", Stars: 99, IsFork: true},
+		},
 	}
 	p.Productive[9] = 3
 	p.Productive[14] = 7
+	p.Weekday[time.Tuesday] = 12
+	p.Weekday[time.Thursday] = 5
+	p.WeekdayAllTime[time.Monday] = 30
+	p.WeekdayAllTime[time.Friday] = 42
+
+	// Last-year daily series — one contribution every Monday, plus a burst
+	// covering a three-day streak so computeStreak has something to find.
+	base := time.Date(2025, 4, 1, 0, 0, 0, 0, time.UTC)
+	for i := 0; i < 365; i++ {
+		d := github.DailyContribution{Date: base.AddDate(0, 0, i)}
+		if d.Date.Weekday() == time.Monday {
+			d.Count = 2
+		}
+		p.DailyContributions = append(p.DailyContributions, d)
+	}
+	p.DailyContributions[100].Count = 7
+	p.DailyContributions[101].Count = 5
+	p.DailyContributions[102].Count = 3
+	// All-time series covers 3 full years so the by-year card has ≥3 bars.
+	allBase := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+	for i := 0; i < 365*3; i++ {
+		d := github.DailyContribution{Date: allBase.AddDate(0, 0, i)}
+		if i%5 == 0 {
+			d.Count = 1
+		}
+		p.DailyContributionsAllTime = append(p.DailyContributionsAllTime, d)
+	}
 
 	th, ok := theme.Lookup("dracula")
 	if !ok {
@@ -50,10 +83,16 @@ func TestRenderAll(t *testing.T) {
 		"most-commit-language.svg",
 		"stats.svg",
 		"productive-time.svg",
+		"productive-weekday.svg",
 		"contributions.svg",
+		"contributions-heatmap.svg",
+		"top-starred-repos.svg",
+		"streak.svg",
 		"most-commit-language-all-time.svg",
 		"productive-time-all-time.svg",
+		"productive-weekday-all-time.svg",
 		"contributions-all-time.svg",
+		"contributions-by-year.svg",
 	}
 	for _, name := range want {
 		data, err := os.ReadFile(filepath.Join(dir, "dracula", name))

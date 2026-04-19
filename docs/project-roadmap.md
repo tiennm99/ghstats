@@ -62,6 +62,18 @@ Follow-up after the full-project review (`plans/reports/code-review-260418-2223-
 - Repo topics expanded for Marketplace discoverability (`ghstats-cards`, `profile-readme`, `stats-cards`, etc.).
 - An attempted repo rename to `tiennm99/ghstats-cards` was committed and reverted (commits `399a3dc` + `8bd2128` on record) — GHCR path immutability and the cost of breaking pinned consumers outweighed the Marketplace-name cosmetic benefit.
 
+## Phase 7.6 — S-tier breadth cards (✅ done)
+
+Five new cards that ride on data already fetched — zero extra API calls:
+
+- `contributions-heatmap` — canonical 7×53 calendar grid with a theme-derived 5-bucket intensity ramp.
+- `contributions-by-year` — one bar per active year, peak year highlighted.
+- `productive-weekday` + `productive-weekday-all-time` — mirror the hour-of-day pair; `FetchProductive` now also fills `Weekday` / `WeekdayAllTime` histograms.
+- `top-starred-repos` — top 5 owned non-fork repos by ⭐; required threading `Stars` through `RepoInfo`.
+- `streak` — current + longest streak + active days/total. Pure post-processing of `DailyContributionsAllTime`.
+
+Card count: 9 → 14. `FetchProductive` still pays for commit-history pagination once; the new cards are pure renderers.
+
 ## Phase 7.5 — Demo gallery for theme discovery (✅ done)
 
 - New `.github/workflows/demo.yml` renders every card for every theme against the repo owner's profile on each push to `main`.

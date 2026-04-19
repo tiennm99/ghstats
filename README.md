@@ -21,10 +21,16 @@ Cards rendered:
 | 2 | Most commit language (last year) | Donut + legend: last-year commits byte-weighted across each repo's language breakdown |
 | 3 | Stats | Star, commit (lifetime + last-year), PR, issue, PR-review, contributed-to totals |
 | 4 | Productive time (last year) | 24-hour bar chart with axes, title includes `UTC±N.NN` |
-| 5 | Contributions (last year) | Smooth monthly area chart, Y-axis mirrored both sides, `mm/yy` labels |
-| 6 | **Most commit language (all time)** | Same as #2 but over lifetime commits |
-| 7 | **Productive time (all time)** | Same as #4 but over lifetime commits |
-| 8 | **Contributions (all time)** | Area chart across every active year, auto-thinned x-axis labels |
+| 5 | Productive weekday (last year) | 7-bar day-of-week chart, peak day highlighted |
+| 6 | Contributions (last year) | Smooth monthly area chart, Y-axis mirrored both sides, `mm/yy` labels |
+| 7 | Contributions heatmap | Classic 7×53 calendar grid with theme-derived intensity ramp and legend |
+| 8 | Top starred repos | Top 5 owned non-fork repos by ⭐, language dot + proportional bar |
+| 9 | Streak | Current streak, longest streak, active days / total days with date ranges |
+| 10 | **Most commit language (all time)** | Same as #2 but over lifetime commits |
+| 11 | **Productive time (all time)** | Same as #4 but over lifetime commits |
+| 12 | **Productive weekday (all time)** | Same as #5 but over lifetime commits |
+| 13 | **Contributions (all time)** | Area chart across every active year, auto-thinned x-axis labels |
+| 14 | **Contributions by year** | One bar per active year, peak year highlighted |
 
 Live `dracula` sample ships in [`output/dracula/`](./output/dracula). Every available theme rendered against the author's profile — profile details, stats, language donuts, productive-time, contributions — is browsable in the auto-generated [**demo gallery**](./demo). Regenerated on every push to `main` by [`.github/workflows/demo.yml`](./.github/workflows/demo.yml).
 
@@ -72,10 +78,16 @@ Then embed the cards in your `README.md`:
 ![most-commit-language](./output/dracula/most-commit-language.svg)
 ![stats](./output/dracula/stats.svg)
 ![productive-time](./output/dracula/productive-time.svg)
+![productive-weekday](./output/dracula/productive-weekday.svg)
 ![contributions](./output/dracula/contributions.svg)
+![contributions-heatmap](./output/dracula/contributions-heatmap.svg)
+![top-starred-repos](./output/dracula/top-starred-repos.svg)
+![streak](./output/dracula/streak.svg)
 ![most-commit-language-all-time](./output/dracula/most-commit-language-all-time.svg)
 ![productive-time-all-time](./output/dracula/productive-time-all-time.svg)
+![productive-weekday-all-time](./output/dracula/productive-weekday-all-time.svg)
 ![contributions-all-time](./output/dracula/contributions-all-time.svg)
+![contributions-by-year](./output/dracula/contributions-by-year.svg)
 ```
 
 ### Action inputs
@@ -163,10 +175,16 @@ output/
     most-commit-language.svg
     stats.svg
     productive-time.svg
+    productive-weekday.svg
     contributions.svg
+    contributions-heatmap.svg
+    top-starred-repos.svg
+    streak.svg
     most-commit-language-all-time.svg
     productive-time-all-time.svg
+    productive-weekday-all-time.svg
     contributions-all-time.svg
+    contributions-by-year.svg
 ```
 
 Only the `dracula` theme is tracked in git as a reference sample; other

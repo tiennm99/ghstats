@@ -43,6 +43,12 @@ type Profile struct {
 	Productive        [24]int
 	ProductiveAllTime [24]int
 
+	// Same pagination also feeds day-of-week histograms (index 0 = Sunday
+	// to match time.Weekday). Last-year and all-time kept separately so the
+	// weekday cards mirror the hour-of-day pair.
+	Weekday        [7]int
+	WeekdayAllTime [7]int
+
 	// CommitsByLanguageAllTime is the lifetime counterpart of
 	// CommitsByLanguage, computed from the same commit stream.
 	CommitsByLanguageAllTime []LangStat
@@ -98,6 +104,7 @@ type LangStat struct {
 type RepoInfo struct {
 	Owner           string
 	Name            string
+	Stars           int
 	IsPrivate       bool
 	IsFork          bool
 	PrimaryLanguage string
@@ -148,6 +155,7 @@ func (r repoNode) toRepoInfo(defaultOwner string) RepoInfo {
 	info := RepoInfo{
 		Owner:     defaultOwner,
 		Name:      r.Name,
+		Stars:     r.StargazerCount,
 		IsPrivate: r.IsPrivate,
 		IsFork:    r.IsFork,
 	}
