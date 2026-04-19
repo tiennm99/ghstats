@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="200" viewBox="0 0 340 200" font-family="'Segoe UI', Ubuntu, Sans-Serif">
+  <rect x="0.5" y="0.5" width="339" height="199" rx="6" fill="#2b213a" stroke="#000000" stroke-opacity="0.00"/>
+  <text x="20" y="30" font-size="15" font-weight="600" fill="#e2e9ec">Contributions by Year</text>
+  <line x1="35" y1="45" x2="35" y2="155" stroke="#ef8539"/>
+  <line x1="31" y1="155" x2="35" y2="155" stroke="#ef8539"/>
+  <text x="29" y="158" font-size="10" fill="#ef8539" text-anchor="end">0</text>
+  <line x1="31" y1="133" x2="35" y2="133" stroke="#ef8539"/>
+  <text x="29" y="136" font-size="10" fill="#ef8539" text-anchor="end">200</text>
+  <line x1="31" y1="111" x2="35" y2="111" stroke="#ef8539"/>
+  <text x="29" y="114" font-size="10" fill="#ef8539" text-anchor="end">400</text>
+  <line x1="31" y1="89" x2="35" y2="89" stroke="#ef8539"/>
+  <text x="29" y="92" font-size="10" fill="#ef8539" text-anchor="end">600</text>
+  <line x1="31" y1="67" x2="35" y2="67" stroke="#ef8539"/>
+  <text x="29" y="70" font-size="10" fill="#ef8539" text-anchor="end">800</text>
+  <line x1="31" y1="45" x2="35" y2="45" stroke="#ef8539"/>
+  <text x="29" y="48" font-size="10" fill="#ef8539" text-anchor="end">1000</text>
+  <line x1="35" y1="155" x2="325" y2="155" stroke="#ef8539"/>
+  <rect x="35.00" y="149.50" width="30.44" height="5.50" rx="2" fill="#8f8f9b"><title>2018 — 50 commits</title></rect>
+  <text x="50.22" y="169" font-size="10" fill="#ef8539" text-anchor="middle">2018</text>
+  <rect x="67.44" y="152.69" width="30.44" height="2.31" rx="2" fill="#8f8f9b"><title>2019 — 21 commits</title></rect>
+  <rect x="99.89" y="148.07" width="30.44" height="6.93" rx="2" fill="#8f8f9b"><title>2020 — 63 commits</title></rect>
+  <text x="115.11" y="169" font-size="10" fill="#ef8539" text-anchor="middle">2020</text>
+  <rect x="132.33" y="149.83" width="30.44" height="5.17" rx="2" fill="#8f8f9b"><title>2021 — 47 commits</title></rect>
+  <rect x="164.78" y="120.68" width="30.44" height="34.32" rx="2" fill="#8f8f9b"><title>2022 — 312 commits</title></rect>
+  <text x="180.00" y="169" font-size="10" fill="#ef8539" text-anchor="middle">2022</text>
+  <rect x="197.22" y="100.22" width="30.44" height="54.78" rx="2" fill="#8f8f9b"><title>2023 — 498 commits</title></rect>
+  <rect x="229.67" y="114.30" width="30.44" height="40.70" rx="2" fill="#8f8f9b"><title>2024 — 370 commits</title></rect>
+  <text x="244.89" y="169" font-size="10" fill="#ef8539" text-anchor="middle">2024</text>
+  <rect x="262.11" y="34.44" width="30.44" height="120.56" rx="2" fill="#e2e9ec"><title>2025 — 1096 commits</title></rect>
+  <rect x="294.56" y="45.77" width="30.44" height="109.23" rx="2" fill="#8f8f9b"><title>2026 — 993 commits</title></rect>
+  <text x="309.78" y="169" font-size="10" fill="#ef8539" text-anchor="middle">2026</text>
+</svg>
