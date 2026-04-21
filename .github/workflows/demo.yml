@@ -66,52 +66,43 @@ jobs:
             done
           } > demo/README.md
 
-          # Per-theme page groups singletons at top, then compares last-year
-          # vs all-time variants side-by-side so the reader can eyeball the
-          # evolution of each metric without scrolling.
+          # Per-theme page mirrors the author profile README table layout at
+          # tiennm99/tiennm99 — singletons stacked two-per-row, streak spans
+          # the full width, then the four last-year/all-time pairs sit in
+          # consecutive rows under a shared header.
           for theme in $themes; do
             dir="demo/$theme"
             [ -d "$dir" ] || continue
             out="$dir/README.md"
-            pair() {
-              local heading="$1" left="$2" right="$3"
-              [ -f "$dir/$left.svg" ] && [ -f "$dir/$right.svg" ] || return
-              printf '### %s\n\n' "$heading"
-              printf '<table><tr><th>Last year</th><th>All time</th></tr><tr>\n'
-              printf '<td><img src="./%s.svg" alt="%s" /></td>\n' "$left" "$left"
-              printf '<td><img src="./%s.svg" alt="%s" /></td>\n' "$right" "$right"
-              printf '</tr></table>\n\n'
+            cell() {
+              local name="$1"
+              printf '<td><img src="./%s.svg" alt="%s" /></td>' "$name" "$name"
             }
-            single() {
-              local heading="$1" name="$2"
-              [ -f "$dir/$name.svg" ] || return
-              printf '### %s\n\n![%s](./%s.svg)\n\n' "$heading" "$name" "$name"
+            row_pair() {
+              printf '<tr>'
+              cell "$1"
+              cell "$2"
+              printf '</tr>\n'
+            }
+            row_span() {
+              printf '<tr><td colspan="2" align="center"><img src="./%s.svg" alt="%s" /></td></tr>\n' "$1" "$1"
             }
             {
               printf '# ghstats — %s\n\n' "$theme"
               printf '[← back to index](../README.md)\n\n'
-              printf 'Rendered for [`%s`](https://github.com/%s). 15 SVGs below, ' "$OWNER" "$OWNER"
-              printf 'grouped so the last-year / all-time pairs sit next to each other.\n\n'
-              printf '## At-a-glance\n\n'
-              single "Profile" profile-details
-              single "Stats"   stats
-              single "Streak"  streak
-
-              printf '## Repos\n\n'
-              single "Top starred"     top-starred-repos
-              single "Repos per language" repos-per-language
-
-              printf '## Contributions — time series\n\n'
-              single "Calendar heatmap (last year)" contributions-heatmap
-              single "By year (all time)"           contributions-by-year
-              pair   "Monthly shape"  contributions            contributions-all-time
-
-              printf '## When you commit\n\n'
-              pair "By hour of day" productive-time    productive-time-all-time
-              pair "By day of week" productive-weekday productive-weekday-all-time
-
-              printf '## What you commit in\n\n'
-              pair "Byte-weighted language share" most-commit-language most-commit-language-all-time
+              printf 'Rendered for [`%s`](https://github.com/%s). 15 SVGs laid out to ' "$OWNER" "$OWNER"
+              printf 'match the author profile README table.\n\n'
+              printf '<div align="center">\n\n<table>\n'
+              row_pair profile-details    stats
+              row_pair repos-per-language top-starred-repos
+              row_pair contributions-by-year contributions-heatmap
+              row_span streak
+              printf '<tr><th>Last year</th><th>All time</th></tr>\n'
+              row_pair most-commit-language   most-commit-language-all-time
+              row_pair contributions          contributions-all-time
+              row_pair productive-weekday     productive-weekday-all-time
+              row_pair productive-time        productive-time-all-time
+              printf '</table>\n\n</div>\n'
             } > "$out"
           done
 
