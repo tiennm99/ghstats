@@ -23,7 +23,7 @@ func TestRenderAll(t *testing.T) {
 		Company:     "VNG & <Corp>",
 		Followers:   12,
 		Following:   7,
-		PublicRepos: 42,
+		RepoCount: 42,
 		TotalStars:  1234,
 		ReposByLanguage: []github.LangStat{
 			{Name: "Go", Color: "#00ADD8", Value: 5},
@@ -376,7 +376,7 @@ func adversarialProfile() *github.Profile {
 		Website:                    "https://example-with-a-very-long-domain.example.com/profile",
 		Followers:                  1_234_567,
 		Following:                  98_765,
-		PublicRepos:                4_321,
+		RepoCount:                  4_321,
 		TotalStars:                 10_000_000,
 		TotalCommits:               123_456,
 		TotalCommitsAllTime:        9_876_543,

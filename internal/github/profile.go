@@ -66,6 +66,36 @@ type profileGQL struct {
 type FetchOptions struct {
 	IncludeForks   bool
 	IncludePrivate bool
+	// IncludeOrgRepos widens the repo-owned aggregates (stars, forks, repo
+	// count, repos-per-language, top-starred) beyond the user's own namespace
+	// to org-owned repos they administer. Off by default: turning it on
+	// changes every one of those numbers, so it stays an explicit opt-in.
+	IncludeOrgRepos bool
+}
+
+// adminPermission is the viewerPermission value that marks an org repo as
+// effectively the user's own. Members with WRITE/READ on a company repo they
+// never created would otherwise inflate every owned-repo aggregate.
+const adminPermission = "ADMIN"
+
+// repoAffiliations maps opts onto the ownerAffiliations argument. OWNER alone
+// is GitHub's "repos in your own namespace"; ORGANIZATION_MEMBER adds repos
+// owned by orgs the user belongs to, which viewerPermission then narrows.
+func repoAffiliations(opts FetchOptions) []string {
+	if opts.IncludeOrgRepos {
+		return []string{"OWNER", "ORGANIZATION_MEMBER"}
+	}
+	return []string{"OWNER"}
+}
+
+// ownedByUser reports whether a repo node counts as the user's own for the
+// repo-derived cards: anything in their namespace, plus org repos they
+// administer when opts allows it.
+func ownedByUser(r repoNode, login string, opts FetchOptions) bool {
+	if r.Owner == nil || r.Owner.Login == login {
+		return true
+	}
+	return opts.IncludeOrgRepos && r.ViewerPermission == adminPermission
 }
 
 // FetchProfile collects profile, stats and repos-per-language data for the
@@ -79,12 +109,15 @@ func (c *Client) FetchProfile(ctx context.Context, login string, opts FetchOptio
 	p := &Profile{Login: login}
 	reposPerLang := map[string]int64{}
 	langColor := map[string]string{}
-	publicRepoCount := 0
+	repoCount := 0
 
 	var cursor *string
 	const maxPages = 10
 	for page := 0; page < maxPages; page++ {
-		vars := map[string]any{"login": login}
+		vars := map[string]any{
+			"login":        login,
+			"affiliations": repoAffiliations(opts),
+		}
 		if cursor != nil {
 			vars["after"] = *cursor
 		}
@@ -137,13 +170,16 @@ func (c *Client) FetchProfile(ctx context.Context, login string, opts FetchOptio
 		}
 
 		for _, r := range u.Repositories.Nodes {
+			if !ownedByUser(r, login, opts) {
+				continue
+			}
 			if r.IsFork && !opts.IncludeForks {
 				continue
 			}
 			if r.IsPrivate && !opts.IncludePrivate {
 				continue
 			}
-			publicRepoCount++
+			repoCount++
 			p.TotalStars += r.StargazerCount
 			p.TotalForks += r.ForkCount
 
@@ -170,7 +206,7 @@ func (c *Client) FetchProfile(ctx context.Context, login string, opts FetchOptio
 	}
 
 	p.ReposByLanguage = sortLangStats(reposPerLang, langColor)
-	p.PublicRepos = publicRepoCount
+	p.RepoCount = repoCount
 	return p, nil
 }
 

@@ -95,7 +95,7 @@ func buildProfileRows(p *github.Profile) []profileRow {
 	})
 	rows = append(rows, profileRow{
 		icon:  iconRepos,
-		value: fmt.Sprintf("%s public repos", formatInt(p.PublicRepos)),
+		value: fmt.Sprintf("%s repos", formatInt(p.RepoCount)),
 	})
 	return rows
 }

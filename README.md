@@ -16,7 +16,7 @@ Cards rendered:
 
 | # | Card | What it shows |
 | --- | --- | --- |
-| 0 | Profile details | Login (Name) title + Octicon-labelled rows for company, location, link, join date (with age), followers/following, public repos |
+| 0 | Profile details | Login (Name) title + Octicon-labelled rows for company, location, link, join date (with age), followers/following, repo count |
 | 1 | Repos per language | Donut + legend: how many owned non-fork repos use each language as primary |
 | 2 | Most commit language (last year) | Donut + legend: last-year commits byte-weighted across each repo's language breakdown |
 | 3 | Stats | Star, commit (lifetime + last-year), PR, issue, PR-review, contributed-to totals |
@@ -35,7 +35,7 @@ Cards rendered:
 
 ## Preview — dracula theme
 
-Live render against the author's profile, committed by [`.github/workflows/demo.yml`](./.github/workflows/demo.yml) on every push to `main`. Rendered with `start_of_week: monday` so the heatmap rows and weekday bars start on Mon. Other 64 themes in the [**demo gallery**](./demo).
+Live render against the author's profile, committed by [`.github/workflows/demo.yml`](./.github/workflows/demo.yml) on every push to `main`. Rendered with `start_of_week: monday` so the heatmap rows and weekday bars start on Mon, and `include_org_repos` on so repos under the author's orgs count toward the repo and language totals. Other 64 themes in the [**demo gallery**](./demo).
 
 <div align="center">
 
@@ -124,6 +124,7 @@ Then embed the cards in your `README.md`:
 | `commits_per_repo` | `500`                            | Max commits sampled per repo (covers last-year and all-time aggregates) |
 | `include_forks`    | `true`                           | Include forked repos in stats and commit probing                        |
 | `include_private`  | `true`                           | Include private repos (requires PAT with `repo` scope; silently no-op otherwise) |
+| `include_org_repos`| `false`                          | Count org-owned repos you administer toward stars, repo count, languages, top-starred (needs `read:org`) |
 | `commit_changes`   | `false`                          | Commit generated cards back to the repo                                 |
 | `commit_message`   | `chore: update ghstats cards`    | Commit message                                                          |
 | `commit_branch`    | *(current ref)*                  | Target branch for auto-commit                                           |
@@ -163,11 +164,14 @@ ghstats -user tiennm99 -themes dracula,github_dark -tz Asia/Saigon -out output
 | `-commits-per-repo` | `500`           | Max commits sampled per repo                                           |
 | `-include-forks`    | `true`          | Include forked repos in the stats                                      |
 | `-include-private`  | `true`          | Include private repos (requires `repo` PAT scope; silently no-op otherwise) |
+| `-include-org-repos`| `false`         | Count org-owned repos you administer toward stars, repo count, languages, top-starred |
 | `-list-themes`      |                 | Print available theme ids and exit                                     |
 
 ## How attribution works
 
-**Repo sampling** uses a seed list built from `contributionsCollection.commitContributionsByRepository`, unioned across every active contribution year. This catches every repo you've committed in — not just your top-starred ones.
+**Repo sampling** uses a seed list built from `contributionsCollection.commitContributionsByRepository`, unioned across every active contribution year. This catches every repo you've committed in — not just your top-starred ones. Each year is queried a quarter at a time: the API caps that field at 100 repos per query and drops the rest without saying so, which a prolific year hits easily.
+
+**Which repos count where.** The commit-driven cards (most-commit-language, productive time, productive weekday, and everything derived from the contribution calendar) cover repos in *any* namespace you committed to — your own, your orgs', and upstream repos you sent PRs to. The repo-driven cards (stars, repo count, repos-per-language, top-starred) look only at repos you own. Set `include_org_repos` / `-include-org-repos` to also count org-owned repos where your permission is `ADMIN`; org repos you merely have read or write access to are never counted.
 
 **Commit-to-language** is byte-weighted: each commit credits every language in the repo, proportional to linguist's byte share. A commit to a 60% Go / 40% Python repo adds 0.6 to Go and 0.4 to Python, regardless of which file was touched. Caveats:
 
@@ -175,7 +179,7 @@ ghstats -user tiennm99 -themes dracula,github_dark -tz Asia/Saigon -out output
 - For per-file accuracy, a future `-accurate-languages` mode is planned (per-commit REST + go-enry).
 
 **Cost per run** (current defaults, typical user):
-- ~1 profile query + ~1 query per active year + ~50 commit-history pages ≈ **50-70 GraphQL calls**.
+- ~1 profile query + ~4 queries per active year + ~50 commit-history pages ≈ **80-100 GraphQL calls**.
 - Zero REST calls. Well under the 5000 points/hr budget.
 
 ## Themes
@@ -223,6 +227,10 @@ access token with `read:user` and `repo`, save it as a repo secret (e.g.
 defaults to `true` so those commits are counted automatically once the token
 has `repo` scope; pass `include_private: "false"` if you want to keep private
 work out of the rendered cards even when the token can see it.
+
+Enabling `include_org_repos` additionally needs `read:org` on the token, and
+SSO authorization for any org that enforces it — otherwise those repos stay
+invisible and the input silently changes nothing.
 
 ## Credits & inspiration
 

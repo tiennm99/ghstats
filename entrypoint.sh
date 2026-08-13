@@ -16,6 +16,7 @@ top_repos="${INPUT_TOP_REPOS:-0}"
 commits_per_repo="${INPUT_COMMITS_PER_REPO:-500}"
 include_forks="${INPUT_INCLUDE_FORKS:-true}"
 include_private="${INPUT_INCLUDE_PRIVATE:-true}"
+include_org_repos="${INPUT_INCLUDE_ORG_REPOS:-false}"
 commit_changes="${INPUT_COMMIT_CHANGES:-false}"
 commit_message="${INPUT_COMMIT_MESSAGE:-chore: update ghstats cards}"
 commit_branch="${INPUT_COMMIT_BRANCH:-}"
@@ -40,7 +41,8 @@ ghstats \
   -top-repos "$top_repos" \
   -commits-per-repo "$commits_per_repo" \
   -include-forks="$include_forks" \
-  -include-private="$include_private"
+  -include-private="$include_private" \
+  -include-org-repos="$include_org_repos"
 
 if [ "$commit_changes" = "true" ]; then
   workspace="${GITHUB_WORKSPACE:-/github/workspace}"

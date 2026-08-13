@@ -27,6 +27,7 @@ func main() {
 		perRepo        = flag.Int("commits-per-repo", 500, "max commits sampled per repo (covers both last-year and all-time aggregates)")
 		includeForks   = flag.Bool("include-forks", true, "include forked repos in stats and commit probing")
 		includePrivate = flag.Bool("include-private", true, "include private repos (requires PAT with repo scope; silently no-op otherwise)")
+		includeOrgs    = flag.Bool("include-org-repos", false, "count org-owned repos you administer toward stars, repo count, repos-per-language and top-starred")
 		timeout        = flag.Duration("timeout", 30*time.Minute, "overall deadline for fetch phase (0 = no limit)")
 		startOfWeek    = flag.String("start-of-week", "sunday", "first day of week for heatmap rows and weekday bars (sunday|monday|tuesday|…)")
 		listThemes     = flag.Bool("list-themes", false, "print available theme ids and exit")
@@ -65,8 +66,9 @@ func main() {
 	}
 
 	opts := github.FetchOptions{
-		IncludeForks:   *includeForks,
-		IncludePrivate: *includePrivate,
+		IncludeForks:    *includeForks,
+		IncludePrivate:  *includePrivate,
+		IncludeOrgRepos: *includeOrgs,
 	}
 
 	// Overall fetch budget. Ctrl-C cancels in-flight HTTP requests cleanly.

@@ -3,8 +3,11 @@ package github
 // profileQuery pulls everything needed for the profile, stats and languages
 // cards in one round trip. Fork/private filtering is done client-side so one
 // query handles all combinations of -include-forks / -include-private.
+// $affiliations decides whether org-owned repos are in scope at all; repos the
+// user only has read/write access to are dropped client-side via
+// viewerPermission.
 const profileQuery = `
-query($login: String!, $after: String) {
+query($login: String!, $after: String, $affiliations: [RepositoryAffiliation]) {
   user(login: $login) {
     id
     login
@@ -44,13 +47,15 @@ query($login: String!, $after: String) {
     repositories(
       first: 100
       after: $after
-      ownerAffiliations: OWNER
+      ownerAffiliations: $affiliations
       orderBy: { field: STARGAZERS, direction: DESC }
     ) {
       totalCount
       pageInfo { hasNextPage endCursor }
       nodes {
         name
+        owner { login }
+        viewerPermission
         isPrivate
         isFork
         stargazerCount

@@ -26,6 +26,8 @@ main.go
   ▼
 FetchProfile(ctx, login, opts)
   │  profileQuery × N pages (owned repos, STARGAZERS desc, 100/page)
+  │  ownerAffiliations = [OWNER] (+ ORGANIZATION_MEMBER when
+  │    opts.IncludeOrgRepos; non-ADMIN org repos dropped client-side)
   │  yields: Profile.{identity, stars, forks, PRs, issues,
   │                   TopRepos, ReposByLanguage,
   │                   ContributionYears,
@@ -34,10 +36,12 @@ FetchProfile(ctx, login, opts)
   │
   ▼
 FetchContributionsAllTime(ctx, profile, opts)
-  │  contributionYearQuery × len(ContributionYears)
-  │  per year: totalCommitContributions +
+  │  contributionYearQuery × 4 quarters × len(ContributionYears)
+  │  per quarter: totalCommitContributions +
   │            contributionCalendar.weeks +
   │            commitContributionsByRepository(maxRepositories: 100)
+  │  quarters keep each window under the 100-repo ceiling, which a
+  │    year-wide window silently truncates at
   │  yields: SeedRepos (deduped),
   │          DailyContributionsAllTime,
   │          TotalCommitsAllTime
@@ -64,14 +68,14 @@ All three queries live in `internal/github/queries.go`.
 | Query | Purpose | Cost estimate |
 | --- | --- | --- |
 | `profileQuery` | Profile identity + totals + owned repos + last-year calendar | 1–10 calls (100 repos/page × ≤10 pages safety cap) |
-| `contributionYearQuery` | Per-year calendar + seed list | 1 call per active year (typically 1–10) |
+| `contributionYearQuery` | Per-quarter calendar + seed list | 4 calls per active year (typically 4–40) |
 | `commitHistoryQuery` | Authored commits on default branch | 1 call per 100 commits per seed repo |
 
 Typical run (8 active years, 30 seed repos, avg 50 commits each):
 - profile: 1 call
-- year loop: 8 calls
+- quarter loop: 8 × 4 = 32 calls
 - commit history: 30 × 1 = 30 calls
-- **≈ 39 GraphQL calls, 0 REST calls**
+- **≈ 63 GraphQL calls, 0 REST calls**
 
 ## Attribution model
 

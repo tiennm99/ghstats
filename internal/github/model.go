@@ -14,9 +14,12 @@ type Profile struct {
 	Website   string
 	CreatedAt time.Time
 
-	Followers   int
-	Following   int
-	PublicRepos int
+	Followers int
+	Following int
+	// RepoCount is how many repos survived the fetch filters, so it tracks
+	// -include-forks / -include-private / -include-org-repos rather than
+	// GitHub's public-only publicRepos count.
+	RepoCount int
 
 	// Totals for the stats card.
 	TotalStars          int
@@ -132,12 +135,15 @@ type LangEdge struct {
 // repoNode is the GraphQL shape of one repository node; kept here because
 // it's shared by the profile fetcher and the productive-time fetcher.
 type repoNode struct {
-	Name            string `json:"name"`
-	IsPrivate       bool   `json:"isPrivate"`
-	IsFork          bool   `json:"isFork"`
-	StargazerCount  int    `json:"stargazerCount"`
-	ForkCount       int    `json:"forkCount"`
-	Owner           *struct {
+	Name           string `json:"name"`
+	IsPrivate      bool   `json:"isPrivate"`
+	IsFork         bool   `json:"isFork"`
+	StargazerCount int    `json:"stargazerCount"`
+	ForkCount      int    `json:"forkCount"`
+	// ViewerPermission is only requested by profileQuery, where it separates
+	// org repos the user administers from ones they merely have access to.
+	ViewerPermission string `json:"viewerPermission"`
+	Owner            *struct {
 		Login string `json:"login"`
 	} `json:"owner"`
 	PrimaryLanguage *struct {
