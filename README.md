@@ -86,6 +86,7 @@ jobs:
           tz: Asia/Saigon
           include_forks: "true"
           include_private: "true"
+          include_org_repos: "false"  # "true" also counts org repos you administer (token needs read:org)
           commit_changes: "true"
 ```
 
@@ -150,6 +151,12 @@ Then:
 ```sh
 export GITHUB_TOKEN=ghp_xxx
 ghstats -user tiennm99 -themes dracula,github_dark -tz Asia/Saigon -out output
+```
+
+Add `-include-org-repos` to also count org-owned repos you administer:
+
+```sh
+ghstats -user tiennm99 -themes dracula -include-org-repos -out output
 ```
 
 | Flag                | Default         | Description                                                            |
