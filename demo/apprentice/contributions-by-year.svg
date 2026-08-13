@@ -4,27 +4,29 @@
   <line x1="35" y1="45" x2="35" y2="155" stroke="#ffffaf"/>
   <line x1="31" y1="155" x2="35" y2="155" stroke="#ffffaf"/>
   <text x="29" y="158" font-size="10" fill="#ffffaf" text-anchor="end">0</text>
-  <line x1="31" y1="128" x2="35" y2="128" stroke="#ffffaf"/>
-  <text x="29" y="131" font-size="10" fill="#ffffaf" text-anchor="end">500</text>
-  <line x1="31" y1="100" x2="35" y2="100" stroke="#ffffaf"/>
-  <text x="29" y="103" font-size="10" fill="#ffffaf" text-anchor="end">1k</text>
-  <line x1="31" y1="73" x2="35" y2="73" stroke="#ffffaf"/>
-  <text x="29" y="76" font-size="10" fill="#ffffaf" text-anchor="end">1.5k</text>
+  <line x1="31" y1="133" x2="35" y2="133" stroke="#ffffaf"/>
+  <text x="29" y="136" font-size="10" fill="#ffffaf" text-anchor="end">1k</text>
+  <line x1="31" y1="111" x2="35" y2="111" stroke="#ffffaf"/>
+  <text x="29" y="114" font-size="10" fill="#ffffaf" text-anchor="end">2k</text>
+  <line x1="31" y1="89" x2="35" y2="89" stroke="#ffffaf"/>
+  <text x="29" y="92" font-size="10" fill="#ffffaf" text-anchor="end">3k</text>
+  <line x1="31" y1="67" x2="35" y2="67" stroke="#ffffaf"/>
+  <text x="29" y="70" font-size="10" fill="#ffffaf" text-anchor="end">4k</text>
   <line x1="31" y1="45" x2="35" y2="45" stroke="#ffffaf"/>
-  <text x="29" y="48" font-size="10" fill="#ffffaf" text-anchor="end">2k</text>
+  <text x="29" y="48" font-size="10" fill="#ffffaf" text-anchor="end">5k</text>
   <line x1="35" y1="155" x2="325" y2="155" stroke="#ffffaf"/>
-  <rect x="35.00" y="152.25" width="30.44" height="2.75" rx="2" fill="#9d9d9d"><title>2018 — 50 commits</title></rect>
+  <rect x="35.00" y="153.79" width="30.44" height="1.21" rx="2" fill="#9d9d9d"><title>2018 — 55 commits</title></rect>
   <text x="50.22" y="169" font-size="10" fill="#ffffaf" text-anchor="middle">2018</text>
-  <rect x="67.44" y="153.84" width="30.44" height="1.16" rx="2" fill="#9d9d9d"><title>2019 — 21 commits</title></rect>
-  <rect x="99.89" y="151.53" width="30.44" height="3.46" rx="2" fill="#9d9d9d"><title>2020 — 63 commits</title></rect>
+  <rect x="67.44" y="154.56" width="30.44" height="0.44" rx="2" fill="#9d9d9d"><title>2019 — 20 commits</title></rect>
+  <rect x="99.89" y="153.57" width="30.44" height="1.43" rx="2" fill="#9d9d9d"><title>2020 — 65 commits</title></rect>
   <text x="115.11" y="169" font-size="10" fill="#ffffaf" text-anchor="middle">2020</text>
-  <rect x="132.33" y="152.41" width="30.44" height="2.58" rx="2" fill="#9d9d9d"><title>2021 — 47 commits</title></rect>
-  <rect x="164.78" y="137.84" width="30.44" height="17.16" rx="2" fill="#9d9d9d"><title>2022 — 312 commits</title></rect>
+  <rect x="132.33" y="153.77" width="30.44" height="1.23" rx="2" fill="#9d9d9d"><title>2021 — 56 commits</title></rect>
+  <rect x="164.78" y="148.14" width="30.44" height="6.86" rx="2" fill="#9d9d9d"><title>2022 — 312 commits</title></rect>
   <text x="180.00" y="169" font-size="10" fill="#ffffaf" text-anchor="middle">2022</text>
-  <rect x="197.22" y="127.61" width="30.44" height="27.39" rx="2" fill="#9d9d9d"><title>2023 — 498 commits</title></rect>
-  <rect x="229.67" y="134.65" width="30.44" height="20.35" rx="2" fill="#9d9d9d"><title>2024 — 370 commits</title></rect>
+  <rect x="197.22" y="143.78" width="30.44" height="11.22" rx="2" fill="#9d9d9d"><title>2023 — 510 commits</title></rect>
+  <rect x="229.67" y="146.31" width="30.44" height="8.69" rx="2" fill="#9d9d9d"><title>2024 — 395 commits</title></rect>
   <text x="244.89" y="169" font-size="10" fill="#ffffaf" text-anchor="middle">2024</text>
-  <rect x="262.11" y="94.72" width="30.44" height="60.28" rx="2" fill="#9d9d9d"><title>2025 — 1096 commits</title></rect>
-  <rect x="294.56" y="65.46" width="30.44" height="89.54" rx="2" fill="#ffffff"><title>2026 — 1628 commits</title></rect>
+  <rect x="262.11" y="127.10" width="30.44" height="27.90" rx="2" fill="#9d9d9d"><title>2025 — 1268 commits</title></rect>
+  <rect x="294.56" y="52.48" width="30.44" height="102.52" rx="2" fill="#ffffff"><title>2026 — 4660 commits</title></rect>
   <text x="309.78" y="169" font-size="10" fill="#ffffaf" text-anchor="middle">2026</text>
 </svg>
