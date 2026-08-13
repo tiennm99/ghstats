@@ -41,9 +41,10 @@ const maxRepositoriesPerWindow = 100
 //
 // A year-wide window silently loses repos once the user commits in more than
 // maxRepositoriesPerWindow of them in that year — the query returns the top
-// 100 and says nothing about the rest. Quarters keep each window well under
-// the ceiling. The API clips contributionCalendar to the exact window (no
-// week-boundary spillover), so concatenating quarters yields each day once.
+// 100 and says nothing about the rest. Quarters bring most years under the
+// ceiling; a quarter that still saturates gets split again by month. The API
+// clips contributionCalendar to the exact window (no week-boundary
+// spillover), so concatenating quarters yields each day once.
 func contributionWindows(year int, now time.Time) [][2]time.Time {
 	var out [][2]time.Time
 	for q := 0; q < 4; q++ {
@@ -79,24 +80,58 @@ func (c *Client) FetchContributionsAllTime(ctx context.Context, p *Profile, opts
 
 	for _, y := range years {
 		for _, w := range contributionWindows(y, now) {
-			if err := c.fetchContributionWindow(ctx, p, opts, w[0], w[1], seen); err != nil {
+			saturated, err := c.fetchContributionWindow(ctx, p, opts, w[0], w[1], seen, true)
+			if err != nil {
 				return err
+			}
+			if !saturated {
+				continue
+			}
+			// The quarter came back at the ceiling, so its repo list is
+			// truncated. Re-ask month by month to recover the tail. Only the
+			// repo lists are merged — the quarter already contributed its
+			// days and commit totals, and folding them again would
+			// double-count.
+			for _, m := range monthWindows(w[0], w[1]) {
+				if _, err := c.fetchContributionWindow(ctx, p, opts, m[0], m[1], seen, false); err != nil {
+					return err
+				}
 			}
 		}
 	}
 	return nil
 }
 
+// monthWindows splits an arbitrary window into calendar months, clamped to the
+// window's own bounds so the pieces cover exactly the same span.
+func monthWindows(from, to time.Time) [][2]time.Time {
+	var out [][2]time.Time
+	start := from
+	for start.Before(to) || start.Equal(to) {
+		next := time.Date(start.Year(), start.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
+		end := next.Add(-time.Second)
+		if end.After(to) {
+			end = to
+		}
+		out = append(out, [2]time.Time{start, end})
+		start = next
+	}
+	return out
+}
+
 // fetchContributionWindow folds a single contributionsCollection window into
-// the profile. Split out from FetchContributionsAllTime so the quarter loop
-// stays readable.
+// the profile and reports whether its repo list came back at the ceiling (and
+// so is truncated). foldCalendar is false for the month re-queries that follow
+// a saturated quarter: those exist only to recover repos, and re-folding their
+// days would count the same contributions twice.
 func (c *Client) fetchContributionWindow(
 	ctx context.Context,
 	p *Profile,
 	opts FetchOptions,
 	from, to time.Time,
 	seen map[string]int,
-) error {
+	foldCalendar bool,
+) (bool, error) {
 	vars := map[string]any{
 		"login": p.Login,
 		"from":  from.Format(time.RFC3339),
@@ -104,7 +139,7 @@ func (c *Client) fetchContributionWindow(
 	}
 	var resp contributionYearGQL
 	if err := c.query(ctx, contributionYearQuery, vars, &resp); err != nil {
-		return err
+		return false, err
 	}
 	if resp.User == nil {
 		// Don't abort the run — other windows may still yield data — but
@@ -112,28 +147,33 @@ func (c *Client) fetchContributionWindow(
 		// empty all-time card silently.
 		fmt.Fprintf(os.Stderr, "warn: contributions %s..%s returned no user data\n",
 			from.Format("2006-01-02"), to.Format("2006-01-02"))
-		return nil
+		return false, nil
 	}
 
 	cc := resp.User.ContributionsCollection
-	p.TotalCommitsAllTime += cc.TotalCommitContributions
-	for _, w := range cc.ContributionCalendar.Weeks {
-		for _, d := range w.ContributionDays {
-			t, err := time.Parse("2006-01-02", d.Date)
-			if err != nil {
-				continue
+	if foldCalendar {
+		p.TotalCommitsAllTime += cc.TotalCommitContributions
+		for _, w := range cc.ContributionCalendar.Weeks {
+			for _, d := range w.ContributionDays {
+				t, err := time.Parse("2006-01-02", d.Date)
+				if err != nil {
+					continue
+				}
+				p.DailyContributionsAllTime = append(p.DailyContributionsAllTime, DailyContribution{
+					Date:  t,
+					Count: d.ContributionCount,
+				})
 			}
-			p.DailyContributionsAllTime = append(p.DailyContributionsAllTime, DailyContribution{
-				Date:  t,
-				Count: d.ContributionCount,
-			})
 		}
 	}
 
-	// Surface a hit ceiling rather than pretending the list is complete.
-	if len(cc.CommitContributionsByRepository) >= maxRepositoriesPerWindow {
+	saturated := len(cc.CommitContributionsByRepository) >= maxRepositoriesPerWindow
+	if saturated && !foldCalendar {
+		// A month at the ceiling has nowhere finer to go, so this is as
+		// complete as the API will answer. Say so instead of implying the
+		// list covers everything.
 		fmt.Fprintf(os.Stderr,
-			"warn: contributions %s..%s hit the %d-repo ceiling; some repos are missing from commit probing\n",
+			"warn: contributions %s..%s hit the %d-repo ceiling even at month granularity; some repos are missing from commit probing\n",
 			from.Format("2006-01-02"), to.Format("2006-01-02"), maxRepositoriesPerWindow)
 	}
 
@@ -153,5 +193,5 @@ func (c *Client) fetchContributionWindow(
 		seen[key] = len(p.SeedRepos)
 		p.SeedRepos = append(p.SeedRepos, info)
 	}
-	return nil
+	return saturated, nil
 }

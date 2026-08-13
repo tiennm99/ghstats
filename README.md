@@ -169,7 +169,7 @@ ghstats -user tiennm99 -themes dracula,github_dark -tz Asia/Saigon -out output
 
 ## How attribution works
 
-**Repo sampling** uses a seed list built from `contributionsCollection.commitContributionsByRepository`, unioned across every active contribution year. This catches every repo you've committed in — not just your top-starred ones. Each year is queried a quarter at a time: the API caps that field at 100 repos per query and drops the rest without saying so, which a prolific year hits easily.
+**Repo sampling** uses a seed list built from `contributionsCollection.commitContributionsByRepository`, unioned across every active contribution year. This catches every repo you've committed in — not just your top-starred ones. Each year is queried a quarter at a time: the API caps that field at 100 repos per query and drops the rest without saying so, which a prolific year hits easily. A quarter that still comes back at the cap is re-asked month by month to recover the tail.
 
 **Which repos count where.** The commit-driven cards (most-commit-language, productive time, productive weekday, and everything derived from the contribution calendar) cover repos in *any* namespace you committed to — your own, your orgs', and upstream repos you sent PRs to. The repo-driven cards (stars, repo count, repos-per-language, top-starred) look only at repos you own. Set `include_org_repos` / `-include-org-repos` to also count org-owned repos where your permission is `ADMIN`; org repos you merely have read or write access to are never counted.
 
@@ -179,7 +179,7 @@ ghstats -user tiennm99 -themes dracula,github_dark -tz Asia/Saigon -out output
 - For per-file accuracy, a future `-accurate-languages` mode is planned (per-commit REST + go-enry).
 
 **Cost per run** (current defaults, typical user):
-- ~1 profile query + ~4 queries per active year + ~50 commit-history pages ≈ **80-100 GraphQL calls**.
+- ~1 profile query + ~4 queries per active year (+3 for any quarter that saturates) + ~50 commit-history pages ≈ **80-100 GraphQL calls**.
 - Zero REST calls. Well under the 5000 points/hr budget.
 
 ## Themes

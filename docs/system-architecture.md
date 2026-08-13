@@ -40,8 +40,10 @@ FetchContributionsAllTime(ctx, profile, opts)
   │  per quarter: totalCommitContributions +
   │            contributionCalendar.weeks +
   │            commitContributionsByRepository(maxRepositories: 100)
-  │  quarters keep each window under the 100-repo ceiling, which a
-  │    year-wide window silently truncates at
+  │  quarters keep most windows under the 100-repo ceiling, which a
+  │    year-wide window silently truncates at; a quarter that still
+  │    saturates is re-queried per month for repos only (its days and
+  │    totals are already folded in)
   │  yields: SeedRepos (deduped),
   │          DailyContributionsAllTime,
   │          TotalCommitsAllTime
@@ -68,7 +70,7 @@ All three queries live in `internal/github/queries.go`.
 | Query | Purpose | Cost estimate |
 | --- | --- | --- |
 | `profileQuery` | Profile identity + totals + owned repos + last-year calendar | 1–10 calls (100 repos/page × ≤10 pages safety cap) |
-| `contributionYearQuery` | Per-quarter calendar + seed list | 4 calls per active year (typically 4–40) |
+| `contributionYearQuery` | Per-quarter calendar + seed list | 4 calls per active year, +3 per saturated quarter |
 | `commitHistoryQuery` | Authored commits on default branch | 1 call per 100 commits per seed repo |
 
 Typical run (8 active years, 30 seed repos, avg 50 commits each):

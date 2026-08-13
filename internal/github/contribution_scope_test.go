@@ -92,3 +92,37 @@ func TestRepoAffiliationsAndOwnership(t *testing.T) {
 		}
 	}
 }
+
+func TestMonthWindowsCoverQuarterExactly(t *testing.T) {
+	from := time.Date(2026, 4, 1, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2026, 6, 30, 23, 59, 59, 0, time.UTC)
+	got := monthWindows(from, to)
+	if len(got) != 3 {
+		t.Fatalf("want 3 months in a quarter, got %d", len(got))
+	}
+	if !got[0][0].Equal(from) {
+		t.Errorf("first month starts at %s, want %s", got[0][0], from)
+	}
+	if !got[len(got)-1][1].Equal(to) {
+		t.Errorf("last month ends at %s, want the quarter's end %s", got[len(got)-1][1], to)
+	}
+	for i := 1; i < len(got); i++ {
+		if !got[i][0].After(got[i-1][1]) {
+			t.Errorf("month %d overlaps month %d", i, i-1)
+		}
+	}
+}
+
+func TestMonthWindowsClampPartialFinalMonth(t *testing.T) {
+	// A current quarter clamped to "now" mid-month must not hand back a
+	// window running past it.
+	from := time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC)
+	now := time.Date(2026, 8, 13, 10, 30, 0, 0, time.UTC)
+	got := monthWindows(from, now)
+	if len(got) != 2 {
+		t.Fatalf("want July + partial August, got %d", len(got))
+	}
+	if !got[1][1].Equal(now) {
+		t.Errorf("final month ends at %s, want clamped to %s", got[1][1], now)
+	}
+}
