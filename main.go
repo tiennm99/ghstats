@@ -24,7 +24,7 @@ func main() {
 		themesFlag     = flag.String("themes", "dracula", "comma-separated theme ids, or 'all'")
 		tzName         = flag.String("tz", "Local", "timezone for productive-time card (IANA name, e.g. Asia/Saigon)")
 		topRepos       = flag.Int("top-repos", 0, "optional cap on seed repos probed for commit history (0 = unlimited)")
-		perRepo        = flag.Int("commits-per-repo", 500, "max commits sampled per repo (covers both last-year and all-time aggregates)")
+		perRepo        = flag.Int("commits-per-repo", 500, "max commits sampled per repo, 0 = every commit (covers both last-year and all-time aggregates)")
 		includeForks   = flag.Bool("include-forks", true, "include forked repos in stats and commit probing")
 		includePrivate = flag.Bool("include-private", true, "include private repos (requires PAT with repo scope; silently no-op otherwise)")
 		includeOrgs    = flag.Bool("include-org-repos", false, "count org-owned repos you administer toward stars, repo count, repos-per-language and top-starred")

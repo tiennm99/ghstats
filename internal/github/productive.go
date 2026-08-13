@@ -30,9 +30,21 @@ type productiveGQL struct {
 // magnitude is irrelevant because the card renders percentages.
 const scaleFactor = 10_000
 
+// reachedCommitCap reports whether a repo has given up enough commits to stop
+// paginating. A cap of zero or less means no cap — keep going until the
+// history runs out — matching how -top-repos treats zero. Without the guard a
+// zero cap would stop before the first page and quietly empty every
+// commit-derived card.
+func reachedCommitCap(seen, maxPerRepo int) bool {
+	if maxPerRepo <= 0 {
+		return false
+	}
+	return seen >= maxPerRepo
+}
+
 // FetchProductive paginates the default-branch commit history (authored by
-// the target user) for each repo up to maxPerRepo commits, and fills two
-// parallel sets of aggregates on the Profile:
+// the target user) for each repo up to maxPerRepo commits (0 = all), and
+// fills two parallel sets of aggregates on the Profile:
 //
 //   - Last-year: p.Productive (24h histogram) and p.CommitsByLanguage
 //   - All-time:  p.ProductiveAllTime and p.CommitsByLanguageAllTime
@@ -62,7 +74,7 @@ func (c *Client) FetchProductive(ctx context.Context, p *Profile, repos []RepoIn
 		var cursor *string
 		seen := 0
 		for {
-			if seen >= maxPerRepo {
+			if reachedCommitCap(seen, maxPerRepo) {
 				break
 			}
 			owner := repo.Owner

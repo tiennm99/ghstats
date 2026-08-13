@@ -36,7 +36,7 @@ inputs:
     required: false
     default: "0"
   commits_per_repo:
-    description: Max commits sampled per repo (covers last-year and all-time aggregates)
+    description: Max commits sampled per repo, `0` for every commit (covers last-year and all-time aggregates)
     required: false
     default: "500"
   include_forks:

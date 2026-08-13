@@ -49,7 +49,7 @@ FetchContributionsAllTime(ctx, profile, opts)
   │          TotalCommitsAllTime
   │
   ▼
-FetchProductive(ctx, profile, profile.SeedRepos, loc, commitsPerRepo)
+FetchProductive(ctx, profile, profile.SeedRepos, loc, commitsPerRepo)  // 0 = no cap
   │  commitHistoryQuery × (#seeds × pages)
   │  per commit: t = committedDate in loc
   │              ProductiveAllTime[t.Hour]++
