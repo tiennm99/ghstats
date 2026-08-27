@@ -1,24 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="340" height="200" viewBox="0 0 340 200" font-family="'Segoe UI', Ubuntu, Sans-Serif">
   <rect x="0.5" y="0.5" width="339" height="199" rx="6" fill="#31353a" stroke="#000000" stroke-opacity="0.00"/>
   <text x="20" y="30" font-size="15" font-weight="600" fill="#19f9d899">Top Starred Repos</text>
-  <circle cx="24" cy="56" r="4" fill="#00ADD8"/>
-  <text x="34" y="60" font-size="12" fill="#ff75b5">awesome-coding-a…</text>
-  <rect x="150" y="52" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
-  <rect x="150" y="52" width="120.00" height="10" rx="3" fill="#19f9d899"/>
-  <text x="334" y="60" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">2 ★</text>
-  <circle cx="24" cy="78" r="4" fill="#00ADD8"/>
-  <text x="34" y="82" font-size="12" fill="#ff75b5">adventofcode</text>
-  <rect x="150" y="74" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
-  <rect x="150" y="74" width="60.00" height="10" rx="3" fill="#19f9d899"/>
-  <text x="334" y="82" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
-  <circle cx="24" cy="100" r="4" fill="#3572A5"/>
-  <text x="34" y="104" font-size="12" fill="#ff75b5">export-telegram-…</text>
-  <rect x="150" y="96" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
-  <rect x="150" y="96" width="60.00" height="10" rx="3" fill="#19f9d899"/>
-  <text x="334" y="104" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
-  <circle cx="24" cy="122" r="4" fill="#f34b7d"/>
-  <text x="34" y="126" font-size="12" fill="#ff75b5">arduino</text>
-  <rect x="150" y="118" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
-  <rect x="150" y="118" width="60.00" height="10" rx="3" fill="#19f9d899"/>
-  <text x="334" y="126" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
+  <circle cx="24" cy="51" r="4" fill="#00ADD8"/>
+  <text x="34" y="55" font-size="12" fill="#ff75b5">awesome-coding-a…</text>
+  <rect x="150" y="47" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="47" width="120.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="55" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">2 ★</text>
+  <circle cx="24" cy="71" r="4" fill="#f1e05a"/>
+  <text x="34" y="75" font-size="12" fill="#ff75b5">rplace</text>
+  <rect x="150" y="67" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="67" width="60.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="75" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
+  <circle cx="24" cy="91" r="4" fill="#f1e05a"/>
+  <text x="34" y="95" font-size="12" fill="#ff75b5">ai-coding-workfl…</text>
+  <rect x="150" y="87" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="87" width="60.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="95" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
+  <circle cx="24" cy="111" r="4" fill="#19f9d899"/>
+  <text x="34" y="115" font-size="12" fill="#ff75b5">penny-pincher-pr…</text>
+  <rect x="150" y="107" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="107" width="60.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="115" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
+  <circle cx="24" cy="131" r="4" fill="#dea584"/>
+  <text x="34" y="135" font-size="12" fill="#ff75b5">time-mocker</text>
+  <rect x="150" y="127" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="127" width="60.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="135" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
+  <circle cx="24" cy="151" r="4" fill="#00ADD8"/>
+  <text x="34" y="155" font-size="12" fill="#ff75b5">adventofcode</text>
+  <rect x="150" y="147" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="147" width="60.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="155" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
+  <circle cx="24" cy="171" r="4" fill="#3572A5"/>
+  <text x="34" y="175" font-size="12" fill="#ff75b5">export-telegram-…</text>
+  <rect x="150" y="167" width="120" height="10" rx="3" fill="#19f9d899" fill-opacity="0.15"/>
+  <rect x="150" y="167" width="60.00" height="10" rx="3" fill="#19f9d899"/>
+  <text x="334" y="175" font-size="12" font-weight="600" fill="#19f9d899" text-anchor="end">1 ★</text>
 </svg>
