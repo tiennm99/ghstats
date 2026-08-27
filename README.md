@@ -24,7 +24,7 @@ Cards rendered:
 | 5 | Productive weekday (last year) | 7-bar day-of-week chart, peak day highlighted |
 | 6 | Contributions (last year) | Smooth monthly area chart, Y-axis mirrored both sides, `mm/yy` labels |
 | 7 | Contributions heatmap | Classic 7×53 calendar grid with theme-derived intensity ramp and legend |
-| 8 | Top starred repos | Top 5 owned non-fork repos by ⭐, language dot + proportional bar |
+| 8 | Top starred repos | Top 7 owned non-fork repos by ⭐, language dot + proportional bar |
 | 9 | Streak | Current streak, longest streak, active days / total days with date ranges |
 | 10 | **Most commit language (all time)** | Same as #2 but over lifetime commits |
 | 11 | **Productive time (all time)** | Same as #4 but over lifetime commits |

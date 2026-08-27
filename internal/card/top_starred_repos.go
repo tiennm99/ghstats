@@ -12,17 +12,17 @@ type topStarredReposCard struct{}
 
 func (topStarredReposCard) Filename() string { return "top-starred-repos.svg" }
 
-// maxTopRepoRows is how many repos we show. Matches the legend density of the
-// other list-style cards (donut top-5).
-const maxTopRepoRows = 5
+// maxTopRepoRows is how many repos we show. Matches the row count the stats
+// and records cards fit in the shared 340x200 frame.
+const maxTopRepoRows = 7
 
 func (topStarredReposCard) SVG(p *github.Profile, t theme.Theme) ([]byte, error) {
 	const (
 		width   = 340
 		height  = 200
 		rowX    = 20
-		rowY0   = 60
-		rowDY   = 22
+		rowY0   = 55
+		rowDY   = 20
 		barX    = 150
 		barW    = 120 // max bar width; the top repo fills this
 		barH    = 10
